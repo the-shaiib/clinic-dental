@@ -1,0 +1,482 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
+
+:root {
+  --bg: #f4f7ff;
+  --bg-spot-1: #e6edff;
+  --bg-spot-2: #e5ecff;
+  --surface: #ffffff;
+  --text: #122248;
+  --muted: #596487;
+  --line: #dbe4ff;
+  --primary: #1f4eff;
+  --primary-dark: #1238c5;
+  --radius: 16px;
+  --shadow: 0 12px 30px rgba(17, 50, 153, 0.08);
+  --bg-gradient-start: #f1f5ff;
+  --bg-gradient-mid: #e5edff;
+  --bg-gradient-end: #f9fbff;
+  --bg-gradient-spot-1: rgba(56, 98, 255, 0.28);
+  --bg-gradient-spot-2: rgba(98, 131, 255, 0.22);
+  --bg-gradient-overlay-top: rgba(255, 255, 255, 0.68);
+  --bg-gradient-overlay-bottom: rgba(85, 120, 255, 0.1);
+  --bg-gradient-glow: rgba(56, 98, 255, 0.24);
+  --bg-matte-grain: rgba(255, 255, 255, 0.42);
+  --network-line: rgba(16, 30, 70, 0.14);
+  --network-dot: rgba(16, 30, 70, 0.34);
+  --network-glow: rgba(31, 78, 255, 0.18);
+  --glass-surface: rgba(255, 255, 255, 0.46);
+  --glass-surface-strong: rgba(255, 255, 255, 0.58);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-shadow: 0 18px 30px rgba(13, 32, 85, 0.1);
+  --glass-blur: 10px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 8% 10%, var(--bg-spot-1) 0, transparent 28%),
+    radial-gradient(circle at 92% 88%, var(--bg-spot-2) 0, transparent 28%),
+    var(--bg);
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Sora', sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+.site-shell > :not(.site-header):not(.header-spacer) {
+  position: relative;
+  z-index: 1;
+}
+
+.page-main {
+  width: min(1100px, 92%);
+  margin: 32px auto 0;
+  flex: 1;
+}
+
+.page-section {
+  margin-top: 10px;
+  margin-bottom: 26px;
+}
+
+.home-services .service-card,
+.result-section .result-card,
+.reviews-section .review-card,
+.gallery-section .gallery-card,
+.about-page .about-stats article,
+.dashboard-page .dashboard-card,
+.dashboard-page .dashboard-panel,
+.dashboard-page .feature-card,
+.dashboard-page .data-card,
+.contact-page .info-card,
+.contact-page .appointment-panel,
+.contact-page .appointment-confirmation,
+.contact-page .contact-map,
+.contact-page .contact-form {
+  background: var(--glass-surface-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+
+.home-page .home-image-frame,
+.about-page .about-media {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(calc(var(--glass-blur) + 1px));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) + 1px));
+  box-shadow: var(--glass-shadow);
+}
+
+.page-header {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 24px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+}
+
+.section-tag {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.lead {
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease,
+    color 0.28s ease;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: -30% auto -30% -120%;
+  width: 54%;
+  background: rgba(255, 255, 255, 0.34);
+  transform: rotate(20deg);
+  transition: left 0.5s ease;
+}
+
+.btn:hover::after {
+  left: 140%;
+}
+
+.btn:hover {
+  transform: translateY(-4px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  box-shadow: 0 16px 28px rgba(31, 78, 255, 0.24);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 22px 34px rgba(31, 78, 255, 0.34);
+}
+
+.btn-link {
+  background: #fff;
+  border: 2px solid var(--line);
+  color: var(--text);
+}
+
+.btn-link:hover {
+  border-color: #b9cbff;
+  color: var(--primary);
+}
+
+.fade-up {
+  animation: fadeUp 0.85s ease-out both;
+}
+
+.fade-right {
+  animation: fadeRight 0.95s ease-out both;
+}
+
+.fade-left {
+  animation: fadeLeft 0.95s ease-out both;
+}
+
+.fade-delay-1 {
+  animation-delay: 0.12s;
+}
+
+.fade-delay-2 {
+  animation-delay: 0.24s;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #050505;
+  --bg-spot-1: #131313;
+  --bg-spot-2: #0d0d0d;
+  --surface: #111111;
+  --text: #f5f5f5;
+  --muted: #a1a1aa;
+  --line: #27272a;
+  --primary: #a1a1aa;
+  --primary-dark: #52525b;
+  --shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  --bg-gradient-start: #050505;
+  --bg-gradient-mid: #0d0d0f;
+  --bg-gradient-end: #11100e;
+  --bg-gradient-spot-1: rgba(255, 255, 255, 0.09);
+  --bg-gradient-spot-2: rgba(148, 109, 70, 0.24);
+  --bg-gradient-overlay-top: rgba(255, 255, 255, 0.08);
+  --bg-gradient-overlay-bottom: rgba(28, 20, 12, 0.52);
+  --bg-gradient-glow: rgba(168, 126, 84, 0.2);
+  --bg-matte-grain: rgba(255, 255, 255, 0.12);
+  --network-line: rgba(255, 255, 255, 0.2);
+  --network-dot: rgba(255, 255, 255, 0.58);
+  --network-glow: rgba(255, 255, 255, 0.1);
+  --glass-surface: rgba(14, 14, 14, 0.5);
+  --glass-surface-strong: rgba(16, 16, 16, 0.63);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-shadow: 0 22px 36px rgba(0, 0, 0, 0.55);
+  --glass-blur: 11px;
+}
+
+:root[data-theme='dark'] .site-header {
+  background: rgba(8, 8, 8, 0.96);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.42);
+}
+
+:root[data-theme='dark'] .brand {
+  color: #fafafa;
+}
+
+:root[data-theme='dark'] .nav-links.open {
+  background: rgba(12, 12, 12, 0.98);
+}
+
+:root[data-theme='dark'] .nav-backdrop {
+  background: rgba(0, 0, 0, 0.56);
+}
+
+:root[data-theme='dark'] .nav-links.open a.active,
+:root[data-theme='dark'] .nav-links.open a:hover {
+  background: #1b1b1b;
+  color: #f5f5f5;
+}
+
+:root[data-theme='dark'] .login-btn,
+:root[data-theme='dark'] .theme-toggle,
+:root[data-theme='dark'] .menu-toggle {
+  background: #171717;
+  color: #e5e5e5;
+}
+
+:root[data-theme='dark'] .login-btn:hover,
+:root[data-theme='dark'] .theme-toggle:hover,
+:root[data-theme='dark'] .menu-toggle:hover {
+  border-color: #3f3f46;
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .btn-link {
+  background: #171717;
+  color: #ededed;
+}
+
+:root[data-theme='dark'] .btn-link:hover {
+  border-color: #3f3f46;
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .btn-primary {
+  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme='dark'] .btn-primary:hover {
+  box-shadow: 0 22px 34px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme='dark'] .dashboard-page .dashboard-card,
+:root[data-theme='dark'] .dashboard-page .dashboard-panel,
+:root[data-theme='dark'] .dashboard-page .feature-card,
+:root[data-theme='dark'] .dashboard-page .data-card,
+:root[data-theme='dark'] .home-services .service-card,
+:root[data-theme='dark'] .result-section .result-card,
+:root[data-theme='dark'] .reviews-section .review-card,
+:root[data-theme='dark'] .gallery-section .gallery-card,
+:root[data-theme='dark'] .about-page .about-stats article,
+:root[data-theme='dark'] .contact-page .appointment-panel,
+:root[data-theme='dark'] .contact-page .appointment-confirmation {
+  background: var(--glass-surface-strong);
+  border-color: var(--glass-border);
+}
+
+:root[data-theme='dark'] .home-page .home-image-frame,
+:root[data-theme='dark'] .about-page .about-media {
+  background: var(--glass-surface);
+  border-color: var(--glass-border);
+}
+
+:root[data-theme='dark'] .home-page .home-image-frame::before {
+  border-color: rgba(245, 245, 245, 0.2);
+}
+
+:root[data-theme='dark'] .home-page .home-image img,
+:root[data-theme='dark'] .about-page .main-image,
+:root[data-theme='dark'] .about-page .small-image {
+  border-color: var(--line);
+}
+
+:root[data-theme='dark'] .home-page .name-main,
+:root[data-theme='dark'] .home-services .services-head h2,
+:root[data-theme='dark'] .result-section .result-head h2,
+:root[data-theme='dark'] .gallery-section .gallery-head h2,
+:root[data-theme='dark'] .reviews-section .reviews-head h2,
+:root[data-theme='dark'] .about-page .about-content h2,
+:root[data-theme='dark'] .dashboard-page .dashboard-top h1,
+:root[data-theme='dark'] .admin-access-page h1 {
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .home-page .name-sub {
+  color: var(--primary);
+}
+
+:root[data-theme='dark'] .home-page .home-label {
+  background: #181818;
+  border-color: var(--line);
+  color: #d4d4d8;
+}
+
+:root[data-theme='dark'] .home-page .image-badge {
+  background: rgba(15, 15, 15, 0.96);
+  border-color: var(--line);
+  color: #e4e4e7;
+}
+
+:root[data-theme='dark'] .home-page .home-hero::before,
+:root[data-theme='dark'] .home-page .home-hero::after,
+:root[data-theme='dark'] .home-services::before {
+  background: radial-gradient(circle, rgba(245, 245, 245, 0.08), transparent 70%);
+}
+
+:root[data-theme='dark'] .contact-page .field input,
+:root[data-theme='dark'] .contact-page .field select,
+:root[data-theme='dark'] .contact-page .field textarea,
+:root[data-theme='dark'] .admin-access-page .admin-pass-field {
+  background: #0d0d0d;
+  border-color: var(--line);
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .admin-access-page .admin-form input {
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .contact-page .field input:focus,
+:root[data-theme='dark'] .contact-page .field select:focus,
+:root[data-theme='dark'] .contact-page .field textarea:focus,
+:root[data-theme='dark'] .admin-access-page .admin-pass-field:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(161, 161, 170, 0.25);
+}
+
+:root[data-theme='dark'] .admin-access-page .admin-form button {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+:root[data-theme='dark'] .home-services .service-card:hover,
+:root[data-theme='dark'] .result-section .result-card:hover,
+:root[data-theme='dark'] .reviews-section .review-card:hover {
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme='dark'] .reviews-section .review-time {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] .contact-page .info-card i {
+  background: #1a1a1a;
+}
+
+:root[data-theme='dark'] .dashboard-page .panel-button,
+:root[data-theme='dark'] .dashboard-page .table-actions button,
+:root[data-theme='dark'] .contact-page .booking-highlights span,
+:root[data-theme='dark'] .contact-page .confirmation-summary span,
+:root[data-theme='dark'] .home-page .hero-meta span,
+:root[data-theme='dark'] .home-page .hero-meta a {
+  background: #171717;
+  border-color: var(--line);
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .site-footer {
+  background: linear-gradient(135deg, #050505, #111111);
+}
+
+:root[data-theme='dark'] .site-footer p,
+:root[data-theme='dark'] .site-footer .footer-links a {
+  color: #d4d4d8;
+}
+
+:root[data-theme='dark'] .site-footer .social-links a {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .site-footer .social-links a:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+@media (max-width: 900px) {
+  .page-main {
+    width: min(1100px, 94%);
+  }
+}

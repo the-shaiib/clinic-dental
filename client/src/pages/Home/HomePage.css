@@ -1,0 +1,224 @@
+.home-page {
+  padding: 16px 0 30px;
+}
+
+.home-page .home-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: 36px;
+  padding: clamp(16px, 3.2vw, 26px);
+  overflow: hidden;
+}
+
+.home-page .home-hero::before {
+  content: '';
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(31, 78, 255, 0.12), transparent 72%);
+  top: -120px;
+  left: -110px;
+}
+
+.home-page .home-hero::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(31, 78, 255, 0.1), transparent 70%);
+  right: -150px;
+  bottom: -150px;
+}
+
+.home-page .home-content {
+  position: relative;
+  z-index: 1;
+}
+
+.home-page .home-label {
+  margin: 0 0 12px;
+  width: fit-content;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #cfddff;
+  background: #eef3ff;
+  color: #1c4adf;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.home-page .clinic-title {
+  margin: 0;
+  font-size: clamp(2.4rem, 5.4vw, 4.8rem);
+  line-height: 0.96;
+  display: grid;
+  gap: 8px;
+}
+
+.home-page .name-main {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  color: #0f2155;
+}
+
+.home-page .name-sub {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(1rem, 2.1vw, 1.5rem);
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.home-page .clinic-description {
+  margin: 18px 0 0;
+  max-width: 54ch;
+  color: var(--muted);
+  font-size: 1.04rem;
+  line-height: 1.6;
+}
+
+.home-page .hero-meta {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.home-page .hero-meta span,
+.home-page .hero-meta a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.home-page .hero-meta a {
+  transition: transform 0.22s ease, border-color 0.22s ease, color 0.22s ease;
+}
+
+.home-page .hero-meta a:hover {
+  color: var(--primary);
+  border-color: #bfcfff;
+  transform: translateY(-2px);
+}
+
+.home-page .home-actions {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.home-page .home-actions .btn {
+  padding: 12px 20px;
+}
+
+.home-page .home-image {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.home-page .home-image-frame {
+  position: relative;
+  width: min(450px, 100%);
+  padding: 11px;
+  border-radius: 28px;
+  border: 1px solid #c6d6ff;
+  background: linear-gradient(160deg, #e7efff, #d9e4ff);
+}
+
+.home-page .home-image-frame::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 22px;
+  border: 1px dashed rgba(32, 79, 255, 0.25);
+  pointer-events: none;
+}
+
+.home-page .home-image img {
+  width: 100%;
+  display: block;
+  height: auto;
+  object-fit: contain;
+  border-radius: 20px;
+  border: 1px solid #e7edff;
+  background: #fff;
+}
+
+.home-page .image-badge {
+  position: absolute;
+  left: 20px;
+  bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #cad8ff;
+  background: rgba(255, 255, 255, 0.96);
+  color: #1d49db;
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 980px) {
+  .home-page .home-hero {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .home-page .home-image {
+    order: -1;
+  }
+
+  .home-page .home-image-frame {
+    width: min(430px, 92%);
+  }
+}
+
+@media (max-width: 620px) {
+  .home-page .home-hero {
+    padding: 10px 0;
+  }
+
+  .home-page .clinic-title {
+    font-size: clamp(2rem, 11vw, 2.9rem);
+  }
+
+  .home-page .home-actions {
+    width: 100%;
+  }
+
+  .home-page .home-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .home-page .hero-meta {
+    flex-direction: column;
+  }
+
+  .home-page .image-badge {
+    left: 14px;
+    bottom: 12px;
+    font-size: 0.72rem;
+  }
+}

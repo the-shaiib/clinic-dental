@@ -1,0 +1,16 @@
+export const clinicInfo = {
+  doctorName: 'Dr Bijarch Latifa',
+  brandName: 'Dr Bijarch Dental Clinic',
+  heroTitle: 'Pour un sourire eclatant',
+  tagline: 'Conseils et soins dentaires simples et pratiques.',
+  address: 'Marrakech | Gueliz',
+  phonePrimary: '0524 431 150',
+  phoneSecondary: '0611 280 026',
+  phonePrimaryHref: 'tel:0524431150',
+  phoneSecondaryHref: 'tel:0611280026',
+  email: 'contact@drbijarch.ma',
+  emailHref: 'mailto:contact@drbijarch.ma',
+  mapQuery: 'Cabinet dentaire Dr Bijarch Latifa Marrakech Gueliz',
+  mapTitle: 'Dr Bijarch Latifa - Marrakech Gueliz',
+  hours: 'Monday - Saturday | 09:00 - 20:00',
+};
