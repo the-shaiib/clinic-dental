@@ -7,14 +7,14 @@ function SmileGalleryPage() {
     <>
       <section className="page-section fade-up">
         <div className="page-header">
-          <p className="section-tag">Patient Gallery</p>
-          <h1>Before and after cases with real clinic moments</h1>
+          <p className="section-tag">Before & After</p>
+          <h1>Smile transformations from real patients</h1>
           <p className="lead">
-            A professional overview of smile results, treatment progress, and selected images from inside the clinic.
+            A focused look at treatment results and clinic moments, curated for clarity and trust.
           </p>
           <Link className="btn btn-primary" to="/contact">
             <i className="fa-solid fa-calendar-check"></i>
-            Book a Consultation
+            Book Appointment
           </Link>
         </div>
       </section>

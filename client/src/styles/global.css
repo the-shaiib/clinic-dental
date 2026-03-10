@@ -83,7 +83,7 @@ a {
 }
 
 .page-main {
-  width: min(1100px, 92%);
+  width: min(1120px, 88%);
   margin: 32px auto 0;
   flex: 1;
 }
@@ -477,6 +477,6 @@ a {
 
 @media (max-width: 900px) {
   .page-main {
-    width: min(1100px, 94%);
+    width: min(1120px, 92%);
   }
 }

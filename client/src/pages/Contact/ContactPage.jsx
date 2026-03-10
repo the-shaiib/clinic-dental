@@ -1,18 +1,11 @@
 import { useState } from 'react';
 import { clinicInfo } from '../../config/clinicInfo';
-import servicesData from '../Home/Services/servicesData';
 import './ContactPage.css';
-
-const timeSlots = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
 
 function ContactPage() {
   const [formData, setFormData] = useState({
-    service: servicesData[0]?.title ?? '',
-    date: '',
-    time: timeSlots[0],
     name: '',
     phone: '',
-    email: '',
     message: '',
   });
   const [confirmation, setConfirmation] = useState(null);
@@ -41,8 +34,7 @@ function ContactPage() {
         <p className="section-tag">Appointment & Contact</p>
         <h1>Book quickly without waiting on the phone</h1>
         <p className="lead">
-          Choose a service, pick a date and time, and send the request in a few clicks. The frontend is ready for
-          confirmation flows, email reminders, and SMS reminders once the backend is connected.
+          Leave your name, phone number, and a short message. We will contact you to confirm your appointment.
         </p>
       </div>
 
@@ -55,13 +47,6 @@ function ContactPage() {
           </p>
           <p>
             <a href={clinicInfo.phoneSecondaryHref}>{clinicInfo.phoneSecondary}</a>
-          </p>
-        </article>
-        <article className="info-card">
-          <i className="fa-solid fa-envelope"></i>
-          <h3>Email</h3>
-          <p>
-            <a href={clinicInfo.emailHref}>{clinicInfo.email}</a>
           </p>
         </article>
         <article className="info-card">
@@ -80,54 +65,25 @@ function ContactPage() {
         <div className="appointment-intro">
           <div>
             <p className="section-tag">Online Booking</p>
-            <h3>Easy appointment request</h3>
+            <h3>Simple appointment request</h3>
             <p>
-              This booking flow reduces unnecessary calls and gives the admin a cleaner reservation list inside the
-              dashboard.
+              A short form that lets us reach you quickly and confirm the right time.
             </p>
           </div>
 
           <div className="booking-highlights">
             <span>
-              <i className="fa-solid fa-tooth"></i>
-              Select service
-            </span>
-            <span>
-              <i className="fa-regular fa-calendar"></i>
-              Pick date & time
+              <i className="fa-regular fa-pen-to-square"></i>
+              Write your need
             </span>
             <span>
               <i className="fa-regular fa-circle-check"></i>
-              Confirm request
+              We confirm fast
             </span>
           </div>
         </div>
 
-        <form className="contact-form" onSubmit={handleSubmit}>
-          <label className="field">
-            Service
-            <select value={formData.service} onChange={handleChange('service')} required>
-              {servicesData.map((service) => (
-                <option key={service.title} value={service.title}>
-                  {service.title} - {service.price}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            Date
-            <input type="date" value={formData.date} onChange={handleChange('date')} required />
-          </label>
-          <label className="field">
-            Time
-            <select value={formData.time} onChange={handleChange('time')} required>
-              {timeSlots.map((timeSlot) => (
-                <option key={timeSlot} value={timeSlot}>
-                  {timeSlot}
-                </option>
-              ))}
-            </select>
-          </label>
+        <form className="contact-form" id="contact-form" onSubmit={handleSubmit}>
           <label className="field">
             Full Name
             <input type="text" value={formData.name} onChange={handleChange('name')} placeholder="Your full name" required />
@@ -136,17 +92,14 @@ function ContactPage() {
             Phone
             <input type="tel" value={formData.phone} onChange={handleChange('phone')} placeholder="+212..." required />
           </label>
-          <label className="field">
-            Email
-            <input type="email" value={formData.email} onChange={handleChange('email')} placeholder="you@example.com" required />
-          </label>
           <label className="field field-wide">
-            Notes
+            Message
             <textarea
-              rows="4"
+              rows="5"
               value={formData.message}
               onChange={handleChange('message')}
-              placeholder="Tell us what you need or what problem you want to solve"
+              placeholder="Tell us what you need or the problem you want to solve"
+              required
             ></textarea>
           </label>
           <button type="submit" className="btn btn-primary">
@@ -169,15 +122,10 @@ function ContactPage() {
                 <p>Your request has been captured in the frontend booking flow.</p>
               </article>
               <article>
-                <i className="fa-regular fa-envelope"></i>
-                <strong>Email confirmation</strong>
-                <p>Prepared for {confirmation.email} once backend delivery is connected.</p>
-              </article>
-              <article>
                 <i className="fa-solid fa-file-lines"></i>
-                <strong>Appointment details</strong>
+                <strong>Message received</strong>
                 <p>
-                  {confirmation.service} | {confirmation.date || 'Date pending'} | {confirmation.time}
+                  {confirmation.message || 'We will follow up to confirm details.'}
                 </p>
               </article>
             </div>

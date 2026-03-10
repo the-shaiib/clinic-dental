@@ -19,10 +19,6 @@ function App() {
           <Route path="/about" element={<AboutRoutePage />} />
           <Route path="/gallery" element={<SmileGalleryPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/services" element={<Navigate to="/" replace />} />
-          <Route path="/reviews" element={<Navigate to="/about" replace />} />
-          <Route path="/smile-gallery" element={<Navigate to="/gallery" replace />} />
-          <Route path="/clinic" element={<Navigate to="/about" replace />} />
         </Route>
         <Route path="/admin-access" element={<AdminAccessPage />} />
         <Route

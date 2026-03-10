@@ -18,7 +18,7 @@ function Footer() {
             <h4>Pages</h4>
             <div className="footer-links">
               <Link to="/">Home</Link>
-              <Link to="/about">Clinic</Link>
+              <Link to="/about">About</Link>
               <Link to="/gallery">Gallery</Link>
               <Link to="/contact">Contact</Link>
             </div>

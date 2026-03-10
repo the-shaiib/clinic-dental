@@ -7,7 +7,6 @@ const THEME_STORAGE_KEY = 'clinic_theme';
 const navItems = [
   { to: '/', label: 'Home', end: true },
   { to: '/about', label: 'Clinic' },
-  { to: '/gallery', label: 'Gallery' },
   { to: '/contact', label: 'Contact' },
 ];
 
@@ -98,8 +97,8 @@ function Header() {
               <i className={isDarkMode ? 'fa-regular fa-sun' : 'fa-regular fa-moon'}></i>
             </button>
 
-            <Link className="login-btn" to="/admin-access" onClick={handleCloseMenu}>
-              <i className="fa-regular fa-user"></i>
+            <Link className="login-btn" to="/admin-access" onClick={handleCloseMenu} aria-label="Admin login">
+              <i className="fa-solid fa-right-to-bracket"></i>
             </Link>
 
             <button
