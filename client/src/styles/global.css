@@ -10,6 +10,8 @@
   --line: #dbe4ff;
   --primary: #1f4eff;
   --primary-dark: #1238c5;
+  --primary-rgb: 31, 78, 255;
+  --primary-dark-rgb: 18, 56, 197;
   --radius: 16px;
   --shadow: 0 12px 30px rgba(17, 50, 153, 0.08);
   --bg-gradient-start: #f1f5ff;
@@ -269,6 +271,8 @@ a {
   --line: #27272a;
   --primary: #a1a1aa;
   --primary-dark: #52525b;
+  --primary-rgb: 161, 161, 170;
+  --primary-dark-rgb: 82, 82, 91;
   --shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
   --bg-gradient-start: #050505;
   --bg-gradient-mid: #0d0d0f;
@@ -290,8 +294,13 @@ a {
 }
 
 :root[data-theme='dark'] .site-header {
-  background: rgba(8, 8, 8, 0.96);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.42);
+  background: rgba(10, 10, 14, 0.96);
+  border-bottom: 1px solid rgba(var(--primary-rgb), 0.22);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme='dark'] .site-header::after {
+  background: linear-gradient(90deg, transparent, rgba(var(--primary-rgb), 0.28), transparent);
 }
 
 :root[data-theme='dark'] .brand {
@@ -411,25 +420,27 @@ a {
 :root[data-theme='dark'] .contact-page .field input,
 :root[data-theme='dark'] .contact-page .field select,
 :root[data-theme='dark'] .contact-page .field textarea,
-:root[data-theme='dark'] .admin-access-page .admin-pass-field {
+:root[data-theme='dark'] .admin-field input,
+:root[data-theme='dark'] .admin-google-btn {
   background: #0d0d0d;
   border-color: var(--line);
   color: var(--text);
 }
 
-:root[data-theme='dark'] .admin-access-page .admin-form input {
-  color: var(--text);
+:root[data-theme='dark'] .admin-auth-toggle {
+  background: rgba(12, 12, 12, 0.85);
+  border-color: var(--line);
 }
 
 :root[data-theme='dark'] .contact-page .field input:focus,
 :root[data-theme='dark'] .contact-page .field select:focus,
 :root[data-theme='dark'] .contact-page .field textarea:focus,
-:root[data-theme='dark'] .admin-access-page .admin-pass-field:focus-within {
+:root[data-theme='dark'] .admin-field input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(161, 161, 170, 0.25);
 }
 
-:root[data-theme='dark'] .admin-access-page .admin-form button {
+:root[data-theme='dark'] .admin-primary-btn {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
 }
 

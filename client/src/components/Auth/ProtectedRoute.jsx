@@ -6,7 +6,7 @@ function ProtectedRoute({ children }) {
   const isAuthenticated = sessionStorage.getItem(ADMIN_AUTH_KEY) === '1';
 
   if (!isAuthenticated) {
-    return <Navigate to="/admin-access" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
   return children;

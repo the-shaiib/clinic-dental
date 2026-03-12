@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { clinicInfo } from '../../config/clinicInfo';
+import { loadContactRequests, saveContactRequests } from '../../config/contactRequests';
 import './ContactPage.css';
 
 function ContactPage() {
@@ -20,11 +21,41 @@ function ContactPage() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
+    const name = formData.name.trim();
+    const phone = formData.phone.trim();
+    const message = formData.message.trim();
+
+    if (!name || !phone || !message) {
+      return;
+    }
+
     const reference = `RDV-${Date.now().toString().slice(-6)}`;
+    const date = new Date().toLocaleDateString('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+    });
+
+    const newRequest = {
+      id: `C-${Date.now().toString().slice(-6)}`,
+      name,
+      phone,
+      message,
+      date,
+    };
+
+    const updatedRequests = [newRequest, ...loadContactRequests()];
+    saveContactRequests(updatedRequests);
 
     setConfirmation({
-      ...formData,
+      ...newRequest,
       reference,
+    });
+
+    setFormData({
+      name: '',
+      phone: '',
+      message: '',
     });
   };
 

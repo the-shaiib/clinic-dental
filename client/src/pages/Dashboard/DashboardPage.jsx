@@ -1,157 +1,193 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import { ADMIN_AUTH_KEY } from '../../config/adminAuth';
-import servicesData from '../Home/Services/servicesData';
+import { CONTACT_REQUESTS_KEY, loadContactRequests } from '../../config/contactRequests';
+import { loadGalleryItems, saveGalleryItems } from '../../config/galleryItems';
+import { loadBeforeAfterCases, saveBeforeAfterCases } from '../../config/beforeAfterCases';
 import './DashboardPage.css';
 
-const initialAppointments = [
-  {
-    id: 'RDV-1041',
-    patient: 'Salma B.',
-    service: 'Cleaning & Prevention',
-    schedule: 'Today | 10:00',
-    phone: '0611 280 026',
-    status: 'Confirmed',
-    source: 'Website',
-  },
-  {
-    id: 'RDV-1042',
-    patient: 'Yassine A.',
-    service: 'Whitening',
-    schedule: 'Today | 14:00',
-    phone: '0524 431 150',
-    status: 'Pending',
-    source: 'Website',
-  },
-  {
-    id: 'RDV-1043',
-    patient: 'Imane K.',
-    service: 'Orthodontics',
-    schedule: 'Tomorrow | 11:00',
-    phone: '0600 111 222',
-    status: 'Pending',
-    source: 'WhatsApp',
-  },
-  {
-    id: 'RDV-1044',
-    patient: 'Nadia R.',
-    service: 'Implants',
-    schedule: 'Friday | 16:30',
-    phone: '0600 444 555',
-    status: 'Cancelled',
-    source: 'Phone',
-  },
+const initialServices = [
+  { id: 'S-1', title: 'Cleaning & Prevention', price: 'From 300 MAD', status: 'Live' },
+  { id: 'S-2', title: 'Whitening', price: 'From 1200 MAD', status: 'Live' },
+  { id: 'S-3', title: 'Implants', price: 'From 6500 MAD', status: 'Hidden' },
 ];
-
-const initialPatients = [
-  { id: 'P-101', name: 'Salma B.', phone: '0611 280 026', lastVisit: '04 Mar 2026', nextVisit: 'Today | 10:00' },
-  { id: 'P-102', name: 'Yassine A.', phone: '0524 431 150', lastVisit: '28 Feb 2026', nextVisit: 'Today | 14:00' },
-  { id: 'P-103', name: 'Imane K.', phone: '0600 111 222', lastVisit: '17 Feb 2026', nextVisit: 'Tomorrow | 11:00' },
-  { id: 'P-104', name: 'Nadia R.', phone: '0600 444 555', lastVisit: '09 Feb 2026', nextVisit: 'Pending reschedule' },
-];
-
-const initialReviews = [
-  { id: 'R-1', name: 'Salma B.', rating: 5, status: 'Pending', text: 'Simple booking process and very professional care.' },
-  { id: 'R-2', name: 'Yassine A.', rating: 5, status: 'Approved', text: 'Results and clinic photos helped me trust the clinic before booking.' },
-  { id: 'R-3', name: 'Nadia R.', rating: 5, status: 'Pending', text: 'Clean clinic, clear explanations, and reassuring follow-up.' },
-];
-
-const initialGallery = [
-  { id: 'G-1', title: 'Reception Area', group: 'Clinic', status: 'Published' },
-  { id: 'G-2', title: 'Treatment Room', group: 'Clinic', status: 'Published' },
-  { id: 'G-3', title: 'Before / After Case 01', group: 'Results', status: 'Published' },
-  { id: 'G-4', title: 'Doctor Portrait', group: 'Doctors', status: 'Draft' },
-];
-
-const initialFeatures = [
-  {
-    id: 'F-1',
-    icon: 'fa-regular fa-envelope',
-    title: 'Email reminders',
-    description: 'Ready for backend integration after reservation confirmation.',
-    status: 'Ready',
-  },
-  {
-    id: 'F-2',
-    icon: 'fa-solid fa-comment-dots',
-    title: 'Online chat',
-    description: 'Frontend slot prepared for quick patient questions and lead capture.',
-    status: 'Ready',
-  },
-  {
-    id: 'F-3',
-    icon: 'fa-solid fa-mobile-screen-button',
-    title: 'SMS reminders',
-    description: 'UI flow planned for appointment reminders and confirmations.',
-    status: 'Frontend only',
-  },
-];
-
-const createServiceCatalog = () =>
-  servicesData.map((service, index) => ({
-    id: `S-${index + 1}`,
-    title: service.title,
-    price: service.price,
-    status: 'Live',
-  }));
 
 const statusClassName = (status) => status.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
+const readFileAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Failed to read file.'));
+    reader.readAsDataURL(file);
+  });
+
+const toWhatsappNumber = (raw) => {
+  const digits = String(raw ?? '').replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.startsWith('00')) return digits.slice(2);
+  if (digits.startsWith('0') && digits.length === 10) {
+    return `212${digits.slice(1)}`;
+  }
+  return digits;
+};
+
 function DashboardPage() {
   const navigate = useNavigate();
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [patients] = useState(initialPatients);
-  const [reviews, setReviews] = useState(initialReviews);
-  const [gallery, setGallery] = useState(initialGallery);
-  const [serviceCatalog, setServiceCatalog] = useState(createServiceCatalog);
+  const [activeSection, setActiveSection] = useState('gallery-upload');
+  const [beforeAfterItems, setBeforeAfterItems] = useState(() => loadBeforeAfterCases());
+  const [services, setServices] = useState(initialServices);
+  const [contactRequests, setContactRequests] = useState(() => loadContactRequests());
+  const [galleryItems, setGalleryItems] = useState(() => loadGalleryItems());
+  const [galleryForm, setGalleryForm] = useState({
+    title: '',
+    description: '',
+    file: null,
+  });
+  const [beforeAfterForm, setBeforeAfterForm] = useState({
+    title: '',
+    note: '',
+    beforeFile: null,
+    afterFile: null,
+  });
+  const [serviceForm, setServiceForm] = useState({ title: '', price: '' });
+  const galleryFileRef = useRef(null);
+  const beforeFileRef = useRef(null);
+  const afterFileRef = useRef(null);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [showAdminReset, setShowAdminReset] = useState(false);
+  const [adminResetStep, setAdminResetStep] = useState('email');
+  const [adminResetValues, setAdminResetValues] = useState({
+    email: '',
+    code: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [adminResetMessage, setAdminResetMessage] = useState('');
+  const [adminResetError, setAdminResetError] = useState('');
+
+  useEffect(() => {
+    const handleStorage = (event) => {
+      if (event.key === CONTACT_REQUESTS_KEY) {
+        setContactRequests(loadContactRequests());
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   const handleLogout = () => {
     sessionStorage.removeItem(ADMIN_AUTH_KEY);
     navigate('/', { replace: true });
   };
 
-  const handleAppointmentStatus = (id, nextStatus) => {
-    setAppointments((currentState) =>
-      currentState.map((appointment) =>
-        appointment.id === id ? { ...appointment, status: nextStatus } : appointment
-      )
-    );
-  };
+  const handleAddGallery = async (event) => {
+    event.preventDefault();
+    if (!galleryForm.file) return;
 
-  const handleDeleteAppointment = (id) => {
-    setAppointments((currentState) => currentState.filter((appointment) => appointment.id !== id));
-  };
+    const title = galleryForm.title.trim();
+    const description = galleryForm.description.trim();
+    let src = '';
+    try {
+      src = await readFileAsDataUrl(galleryForm.file);
+    } catch (error) {
+      return;
+    }
+    const newItem = {
+      id: `G-${Date.now().toString().slice(-6)}`,
+      src,
+      title,
+      description,
+    };
+    const updatedItems = [newItem, ...galleryItems];
+    setGalleryItems(updatedItems);
+    saveGalleryItems(updatedItems);
 
-  const handleReviewStatus = (id, nextStatus) => {
-    setReviews((currentState) =>
-      currentState.map((review) => (review.id === id ? { ...review, status: nextStatus } : review))
-    );
-  };
-
-  const handleDeleteReview = (id) => {
-    setReviews((currentState) => currentState.filter((review) => review.id !== id));
+    setGalleryForm({ title: '', description: '', file: null });
+    if (galleryFileRef.current) {
+      galleryFileRef.current.value = '';
+    }
   };
 
   const handleDeleteGalleryItem = (id) => {
-    setGallery((currentState) => currentState.filter((item) => item.id !== id));
+    setGalleryItems((current) => {
+      const updated = current.filter((item) => item.id !== id);
+      saveGalleryItems(updated);
+      return updated;
+    });
   };
 
-  const handleAddGalleryItem = () => {
-    setGallery((currentState) => [
-      {
-        id: `G-${currentState.length + 1}`,
-        title: 'New clinic photo draft',
-        group: 'Clinic',
-        status: 'Draft',
-      },
-      ...currentState,
+  const handleAddBeforeAfter = async (event) => {
+    event.preventDefault();
+    if (!beforeAfterForm.beforeFile || !beforeAfterForm.afterFile) return;
+
+    const title = beforeAfterForm.title.trim();
+    const note = beforeAfterForm.note.trim();
+    let beforeImage = '';
+    let afterImage = '';
+    try {
+      [beforeImage, afterImage] = await Promise.all([
+        readFileAsDataUrl(beforeAfterForm.beforeFile),
+        readFileAsDataUrl(beforeAfterForm.afterFile),
+      ]);
+    } catch (error) {
+      return;
+    }
+
+    const newCase = {
+      id: `BA-${Date.now().toString().slice(-6)}`,
+      title,
+      note,
+      beforeImage,
+      afterImage,
+      createdAt: new Date().toISOString(),
+    };
+
+    setBeforeAfterItems((current) => {
+      const updated = [newCase, ...current];
+      saveBeforeAfterCases(updated);
+      return updated;
+    });
+
+    setBeforeAfterForm({
+      title: '',
+      note: '',
+      beforeFile: null,
+      afterFile: null,
+    });
+    if (beforeFileRef.current) beforeFileRef.current.value = '';
+    if (afterFileRef.current) afterFileRef.current.value = '';
+  };
+
+  const handleDeleteBeforeAfter = (id) => {
+    setBeforeAfterItems((current) => {
+      const updated = current.filter((item) => item.id !== id);
+      saveBeforeAfterCases(updated);
+      return updated;
+    });
+  };
+
+  const handleAddService = (event) => {
+    event.preventDefault();
+    const title = serviceForm.title.trim();
+    const price = serviceForm.price.trim();
+    if (!title || !price) return;
+    setServices((current) => [
+      { id: `S-${current.length + 1}`, title, price, status: 'Draft' },
+      ...current,
     ]);
+    setServiceForm({ title: '', price: '' });
   };
 
-  const handleToggleServiceStatus = (id) => {
-    setServiceCatalog((currentState) =>
-      currentState.map((service) =>
+  const handleToggleService = (id) => {
+    setServices((current) =>
+      current.map((service) =>
         service.id === id
           ? { ...service, status: service.status === 'Live' ? 'Hidden' : 'Live' }
           : service
@@ -160,282 +196,663 @@ function DashboardPage() {
   };
 
   const handleDeleteService = (id) => {
-    setServiceCatalog((currentState) => currentState.filter((service) => service.id !== id));
+    setServices((current) => current.filter((service) => service.id !== id));
   };
 
-  const handleAddService = () => {
-    setServiceCatalog((currentState) => [
-      {
-        id: `S-${currentState.length + 1}`,
-        title: 'New service draft',
-        price: 'From 0 MAD',
-        status: 'Draft',
-      },
-      ...currentState,
-    ]);
+  const handlePasswordSubmit = (event) => {
+    event.preventDefault();
+    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
   };
 
-  const todayAppointments = appointments.filter((appointment) => appointment.schedule.startsWith('Today')).length;
-  const pendingReviews = reviews.filter((review) => review.status === 'Pending').length;
+  const resetAdminFlow = () => {
+    setAdminResetValues({
+      email: '',
+      code: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setAdminResetMessage('');
+    setAdminResetError('');
+    setAdminResetStep('email');
+  };
+
+  const handleAdminResetStart = () => {
+    resetAdminFlow();
+    setShowAdminReset(true);
+  };
+
+  const handleAdminResetCancel = () => {
+    resetAdminFlow();
+    setShowAdminReset(false);
+  };
+
+  const handleAdminResetBack = () => {
+    setAdminResetMessage('');
+    setAdminResetError('');
+    if (adminResetStep === 'code') {
+      setAdminResetStep('email');
+      return;
+    }
+    if (adminResetStep === 'password') {
+      setAdminResetStep('code');
+    }
+  };
+
+  const handleAdminResetSubmit = (event) => {
+    event.preventDefault();
+    setAdminResetError('');
+
+    if (adminResetStep === 'email') {
+      const email = adminResetValues.email.trim();
+      if (!email) {
+        setAdminResetError('Please enter your admin email.');
+        return;
+      }
+      setAdminResetMessage(`We sent a reset code to ${email}.`);
+      setAdminResetStep('code');
+      return;
+    }
+
+    if (adminResetStep === 'code') {
+      const code = adminResetValues.code.trim();
+      if (!code) {
+        setAdminResetError('Please enter the verification code.');
+        return;
+      }
+      setAdminResetMessage('Code verified. Create a new password.');
+      setAdminResetStep('password');
+      return;
+    }
+
+    if (adminResetStep === 'password') {
+      const newPassword = adminResetValues.newPassword.trim();
+      const confirmPassword = adminResetValues.confirmPassword.trim();
+      if (!newPassword || !confirmPassword) {
+        setAdminResetError('Please fill in all fields.');
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setAdminResetError('Passwords do not match.');
+        return;
+      }
+      setAdminResetMessage('Admin password updated successfully.');
+      setAdminResetStep('done');
+    }
+  };
+
+  const adminResetStepIndex = {
+    email: 0,
+    code: 1,
+    password: 2,
+    done: 3,
+  }[adminResetStep];
 
   return (
     <div className="site-shell dashboard-route">
       <Header />
       <main className="dashboard-page">
-        <section className="dashboard-shell fade-up">
-          <div className="dashboard-top">
-            <div>
-              <p className="section-tag">Admin Dashboard</p>
-              <h1>Clinic command center</h1>
-              <p className="dashboard-subtitle">
-                Frontend workspace for reservations, patients, reviews, gallery, services, and reminder readiness.
-              </p>
+        <div className="dashboard-shell">
+          <aside className="dashboard-sidebar">
+            <div className="sidebar-head">
+              <span className="sidebar-title">Admin Panel</span>
+              <p className="sidebar-subtitle">Simple control center</p>
             </div>
 
-            <div className="dashboard-top-actions">
-              <span className="dashboard-chip">
-                <i className="fa-solid fa-layer-group"></i>
-                Frontend preview
-              </span>
-              <button className="btn btn-link" type="button" onClick={handleLogout}>
-                <i className="fa-solid fa-right-from-bracket"></i>
+            <nav className="sidebar-nav">
+              <button
+                type="button"
+                className={activeSection === 'gallery-upload' ? 'active' : ''}
+                onClick={() => setActiveSection('gallery-upload')}
+              >
+                Add gallery image
+              </button>
+              <button
+                type="button"
+                className={activeSection === 'before-after' ? 'active' : ''}
+                onClick={() => setActiveSection('before-after')}
+              >
+                Before / After
+              </button>
+              <button
+                type="button"
+                className={activeSection === 'contact-requests' ? 'active' : ''}
+                onClick={() => setActiveSection('contact-requests')}
+              >
+                Contact requests
+              </button>
+              <button
+                type="button"
+                className={activeSection === 'services' ? 'active' : ''}
+                onClick={() => setActiveSection('services')}
+              >
+                Services
+              </button>
+              <button
+                type="button"
+                className={activeSection === 'change-password' ? 'active' : ''}
+                onClick={() => setActiveSection('change-password')}
+              >
+                Change password
+              </button>
+            </nav>
+
+            <div className="sidebar-footer">
+              <button type="button" className="logout-btn" onClick={handleLogout}>
                 Logout
               </button>
             </div>
-          </div>
+          </aside>
 
-          <div className="dashboard-metrics">
-            <article className="dashboard-card">
-              <p>Total Appointments</p>
-              <strong>{appointments.length}</strong>
-            </article>
-            <article className="dashboard-card">
-              <p>Today Appointments</p>
-              <strong>{todayAppointments}</strong>
-            </article>
-            <article className="dashboard-card">
-              <p>Total Patients</p>
-              <strong>{patients.length}</strong>
-            </article>
-            <article className="dashboard-card">
-              <p>Pending Reviews</p>
-              <strong>{pendingReviews}</strong>
-            </article>
-            <article className="dashboard-card">
-              <p>Gallery Assets</p>
-              <strong>{gallery.length}</strong>
-            </article>
-            <article className="dashboard-card">
-              <p>Services</p>
-              <strong>{serviceCatalog.length}</strong>
-            </article>
-          </div>
+          <section className="dashboard-content">
+            <header className="content-head">
+              <p className="section-tag">Dashboard</p>
+              <h1>Clinic admin workspace</h1>
+              <p className="content-subtitle">Manage gallery, requests, and services in one place.</p>
+            </header>
 
-          <div className="dashboard-layout">
-            <section className="dashboard-panel dashboard-panel-wide">
-              <div className="panel-head">
-                <div>
-                  <h2>Appointments</h2>
-                  <p>Confirm, cancel, or delete reservations from the website and phone channels.</p>
+            {activeSection === 'gallery-upload' && (
+              <section className="dashboard-panel">
+                <div className="panel-head">
+                  <div>
+                    <h2>Clinic gallery</h2>
+                    <p>Upload clinic imagery that appears on the homepage gallery.</p>
+                  </div>
                 </div>
-              </div>
-
-              <div className="dashboard-table-wrap">
-                <table className="dashboard-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Patient</th>
-                      <th>Service</th>
-                      <th>Schedule</th>
-                      <th>Source</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {appointments.map((appointment) => (
-                      <tr key={appointment.id}>
-                        <td>{appointment.id}</td>
-                        <td>
-                          <strong>{appointment.patient}</strong>
-                          <span>{appointment.phone}</span>
-                        </td>
-                        <td>{appointment.service}</td>
-                        <td>{appointment.schedule}</td>
-                        <td>{appointment.source}</td>
-                        <td>
-                          <span className={`status-pill status-${statusClassName(appointment.status)}`}>
-                            {appointment.status}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="table-actions">
-                            <button type="button" onClick={() => handleAppointmentStatus(appointment.id, 'Confirmed')}>
-                              Confirm
-                            </button>
-                            <button type="button" onClick={() => handleAppointmentStatus(appointment.id, 'Cancelled')}>
-                              Cancel
-                            </button>
-                            <button type="button" onClick={() => handleDeleteAppointment(appointment.id)}>
+                <form className="panel-form panel-form-wide" onSubmit={handleAddGallery}>
+                  <label>
+                    Image title (optional)
+                    <input
+                      type="text"
+                      value={galleryForm.title}
+                      onChange={(event) =>
+                        setGalleryForm((current) => ({ ...current, title: event.target.value }))
+                      }
+                      placeholder="Reception area"
+                    />
+                  </label>
+                  <label>
+                    Internal description (optional)
+                    <textarea
+                      rows="4"
+                      value={galleryForm.description}
+                      onChange={(event) =>
+                        setGalleryForm((current) => ({ ...current, description: event.target.value }))
+                      }
+                      placeholder="Short internal note for this image."
+                    ></textarea>
+                  </label>
+                  <div className="upload-grid field-wide">
+                    <label className="upload-card">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={galleryFileRef}
+                        className="upload-input"
+                        onChange={(event) =>
+                          setGalleryForm((current) => ({
+                            ...current,
+                            file: event.target.files?.[0] ?? null,
+                          }))
+                        }
+                        required
+                      />
+                      <span className="upload-icon">
+                        <i className="fa-solid fa-cloud-arrow-up"></i>
+                      </span>
+                      <span className="upload-title">Upload gallery image</span>
+                      <span className="upload-subtitle">
+                        {galleryForm.file ? galleryForm.file.name : 'Click to choose file'}
+                      </span>
+                    </label>
+                  </div>
+                  <div className="panel-actions field-wide">
+                    <button type="submit" className="btn btn-primary">
+                      Upload image
+                    </button>
+                  </div>
+                </form>
+                <div className="panel-list gallery-list">
+                  {galleryItems.length === 0 ? (
+                    <p className="panel-helper">No gallery images yet.</p>
+                  ) : (
+                    galleryItems.map((item) => (
+                      <article key={item.id} className="panel-card gallery-card">
+                        <div className="gallery-thumb">
+                          <img src={item.src} alt={item.title || 'Gallery item'} loading="lazy" />
+                        </div>
+                        <div className="gallery-info">
+                          <strong>{item.title || 'Untitled image'}</strong>
+                          {item.description ? <p>{item.description}</p> : <p className="muted">No description.</p>}
+                        </div>
+                        <div className="card-actions">
+                          <div className="mini-actions">
+                            <button type="button" className="danger" onClick={() => handleDeleteGalleryItem(item.id)}>
                               Delete
                             </button>
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            <section className="dashboard-panel">
-              <div className="panel-head">
-                <div>
-                  <h2>Automation</h2>
-                  <p>Extra pro features prepared in the frontend experience.</p>
+                        </div>
+                      </article>
+                    ))
+                  )}
                 </div>
-              </div>
+              </section>
+            )}
 
-              <div className="dashboard-stack">
-                {initialFeatures.map((feature) => (
-                  <article key={feature.id} className="feature-card">
-                    <div className="feature-icon">
-                      <i className={feature.icon}></i>
-                    </div>
-                    <div>
-                      <strong>{feature.title}</strong>
-                      <p>{feature.description}</p>
-                    </div>
-                    <span className={`status-pill status-${statusClassName(feature.status)}`}>{feature.status}</span>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="dashboard-panel">
-              <div className="panel-head">
-                <div>
-                  <h2>Patients</h2>
-                  <p>Clean list of clients with last and next visit details.</p>
+            {activeSection === 'before-after' && (
+              <section className="dashboard-panel">
+                <div className="panel-head">
+                  <div>
+                    <h2>Before &amp; After cases</h2>
+                    <p>Upload both images to showcase real transformations.</p>
+                  </div>
                 </div>
-              </div>
-
-              <div className="dashboard-stack">
-                {patients.map((patient) => (
-                  <article key={patient.id} className="data-card">
-                    <div>
-                      <strong>{patient.name}</strong>
-                      <p>{patient.phone}</p>
-                    </div>
-                    <div className="data-card-meta">
-                      <span>Last: {patient.lastVisit}</span>
-                      <span>Next: {patient.nextVisit}</span>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="dashboard-panel">
-              <div className="panel-head">
-                <div>
-                  <h2>Reviews</h2>
-                  <p>Approve or delete testimonials before they go live.</p>
+                <form className="panel-form panel-form-wide" onSubmit={handleAddBeforeAfter}>
+                  <label>
+                    Case title (optional)
+                    <input
+                      type="text"
+                      value={beforeAfterForm.title}
+                      onChange={(event) =>
+                        setBeforeAfterForm((current) => ({ ...current, title: event.target.value }))
+                      }
+                      placeholder="Whitening case"
+                    />
+                  </label>
+                  <label>
+                    Case note (optional)
+                    <textarea
+                      rows="4"
+                      value={beforeAfterForm.note}
+                      onChange={(event) =>
+                        setBeforeAfterForm((current) => ({ ...current, note: event.target.value }))
+                      }
+                      placeholder="Short summary of the result."
+                    ></textarea>
+                  </label>
+                  <div className="upload-grid field-wide">
+                    <label className="upload-card">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={beforeFileRef}
+                        className="upload-input"
+                        onChange={(event) =>
+                          setBeforeAfterForm((current) => ({
+                            ...current,
+                            beforeFile: event.target.files?.[0] ?? null,
+                          }))
+                        }
+                        required
+                      />
+                      <span className="upload-icon">
+                        <i className="fa-solid fa-cloud-arrow-up"></i>
+                      </span>
+                      <span className="upload-title">Upload before image</span>
+                      <span className="upload-subtitle">
+                        {beforeAfterForm.beforeFile ? beforeAfterForm.beforeFile.name : 'Click to choose file'}
+                      </span>
+                    </label>
+                    <label className="upload-card">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={afterFileRef}
+                        className="upload-input"
+                        onChange={(event) =>
+                          setBeforeAfterForm((current) => ({
+                            ...current,
+                            afterFile: event.target.files?.[0] ?? null,
+                          }))
+                        }
+                        required
+                      />
+                      <span className="upload-icon">
+                        <i className="fa-solid fa-cloud-arrow-up"></i>
+                      </span>
+                      <span className="upload-title">Upload after image</span>
+                      <span className="upload-subtitle">
+                        {beforeAfterForm.afterFile ? beforeAfterForm.afterFile.name : 'Click to choose file'}
+                      </span>
+                    </label>
+                  </div>
+                  <div className="panel-actions field-wide">
+                    <button type="submit" className="btn btn-primary">
+                      Upload case
+                    </button>
+                  </div>
+                </form>
+                <div className="panel-list">
+                  {beforeAfterItems.length === 0 ? (
+                    <p className="panel-helper">No cases yet.</p>
+                  ) : (
+                    beforeAfterItems.map((item) => (
+                      <article key={item.id} className="panel-card before-after-card">
+                        <div className="before-after-preview">
+                          <img
+                            src={item.beforeImage}
+                            alt={item.title ? `Before ${item.title}` : 'Before case'}
+                            loading="lazy"
+                          />
+                          <img
+                            src={item.afterImage}
+                            alt={item.title ? `After ${item.title}` : 'After case'}
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="before-after-info">
+                          <strong>{item.title || 'Untitled case'}</strong>
+                          {item.note ? <p>{item.note}</p> : <p className="muted">No note added.</p>}
+                        </div>
+                        <div className="card-actions">
+                          <div className="mini-actions">
+                            <button
+                              type="button"
+                              className="danger"
+                              onClick={() => handleDeleteBeforeAfter(item.id)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    ))
+                  )}
                 </div>
-              </div>
+              </section>
+            )}
 
-              <div className="dashboard-stack">
-                {reviews.map((review) => (
-                  <article key={review.id} className="data-card">
-                    <div>
-                      <strong>{review.name}</strong>
-                      <p>{review.text}</p>
-                    </div>
-                    <div className="data-card-actions">
-                      <span className={`status-pill status-${statusClassName(review.status)}`}>{review.status}</span>
-                      <div className="table-actions">
-                        <button type="button" onClick={() => handleReviewStatus(review.id, 'Approved')}>
-                          Approve
-                        </button>
-                        <button type="button" onClick={() => handleDeleteReview(review.id)}>
-                          Delete
+            {activeSection === 'contact-requests' && (
+              <section className="dashboard-panel">
+                <div className="panel-head">
+                  <div>
+                    <h2>Contact requests</h2>
+                    <p>Latest messages from the appointment form.</p>
+                  </div>
+                </div>
+                <div className="panel-list">
+                  {contactRequests.length === 0 ? (
+                    <p className="panel-helper">No contact requests yet.</p>
+                  ) : (
+                    contactRequests.map((request) => (
+                      <article key={request.id} className="panel-card request-card">
+                        <div className="request-person">
+                          <strong className="request-name">{request.name}</strong>
+                          {toWhatsappNumber(request.phone) ? (
+                            <a
+                              className="request-phone"
+                              href={`https://wa.me/${toWhatsappNumber(request.phone)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              aria-label={`WhatsApp ${request.phone}`}
+                            >
+                              <i className="fa-brands fa-whatsapp" aria-hidden="true"></i>
+                              <span>{request.phone}</span>
+                            </a>
+                          ) : (
+                            <span className="request-phone">
+                              <i className="fa-brands fa-whatsapp" aria-hidden="true"></i>
+                              <span>{request.phone}</span>
+                            </span>
+                          )}
+                        </div>
+                        <p className="request-message">{request.message}</p>
+                        <small className="request-date">{request.date}</small>
+                      </article>
+                    ))
+                  )}
+                </div>
+              </section>
+            )}
+
+            {activeSection === 'services' && (
+              <section className="dashboard-panel">
+                <div className="panel-head">
+                  <div>
+                    <h2>Services</h2>
+                    <p>Add, hide, or delete services.</p>
+                  </div>
+                </div>
+                <form className="panel-form" onSubmit={handleAddService}>
+                  <label>
+                    Service name
+                    <input
+                      type="text"
+                      value={serviceForm.title}
+                      onChange={(event) =>
+                        setServiceForm((current) => ({ ...current, title: event.target.value }))
+                      }
+                      placeholder="Root canal"
+                      required
+                    />
+                  </label>
+                  <label>
+                    Price
+                    <input
+                      type="text"
+                      value={serviceForm.price}
+                      onChange={(event) =>
+                        setServiceForm((current) => ({ ...current, price: event.target.value }))
+                      }
+                      placeholder="From 0 MAD"
+                      required
+                    />
+                  </label>
+                  <div className="panel-actions">
+                    <button type="submit" className="btn btn-primary">
+                      Add service
+                    </button>
+                  </div>
+                </form>
+                <div className="panel-list">
+                  {services.map((service) => (
+                    <article key={service.id} className="panel-card">
+                      <div>
+                        <strong>{service.title}</strong>
+                        <p>{service.price}</p>
+                      </div>
+                      <div className="card-actions">
+                        <span className={`status-pill status-${statusClassName(service.status)}`}>
+                          {service.status}
+                        </span>
+                        <div className="mini-actions">
+                          <button type="button" onClick={() => handleToggleService(service.id)}>
+                            {service.status === 'Live' ? 'Hide' : 'Publish'}
+                          </button>
+                          <button type="button" className="danger" onClick={() => handleDeleteService(service.id)}>
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {activeSection === 'change-password' && (
+              <section className="dashboard-panel">
+                <div className="panel-head">
+                  <div>
+                    <h2>Change password</h2>
+                    <p>Update your admin password.</p>
+                  </div>
+                </div>
+                {!showAdminReset ? (
+                  <>
+                    <form className="panel-form" onSubmit={handlePasswordSubmit}>
+                      <label>
+                        Current password
+                        <input
+                          type="password"
+                          value={passwordForm.currentPassword}
+                          onChange={(event) =>
+                            setPasswordForm((current) => ({
+                              ...current,
+                              currentPassword: event.target.value,
+                            }))
+                          }
+                          placeholder="Enter current password"
+                          required
+                        />
+                      </label>
+                      <label>
+                        New password
+                        <input
+                          type="password"
+                          value={passwordForm.newPassword}
+                          onChange={(event) =>
+                            setPasswordForm((current) => ({
+                              ...current,
+                              newPassword: event.target.value,
+                            }))
+                          }
+                          placeholder="Enter new password"
+                          required
+                        />
+                      </label>
+                      <label>
+                        Confirm new password
+                        <input
+                          type="password"
+                          value={passwordForm.confirmPassword}
+                          onChange={(event) =>
+                            setPasswordForm((current) => ({
+                              ...current,
+                              confirmPassword: event.target.value,
+                            }))
+                          }
+                          placeholder="Confirm new password"
+                          required
+                        />
+                      </label>
+                      <div className="panel-actions">
+                        <button type="submit" className="btn btn-primary">
+                          Save password
                         </button>
                       </div>
+                    </form>
+                    <p className="panel-helper">
+                      Forgot your admin password?{' '}
+                      <button type="button" className="panel-link" onClick={handleAdminResetStart}>
+                        Reset with email
+                      </button>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="admin-reset-steps" aria-hidden="true">
+                      {['Email', 'Verify', 'New password'].map((label, index) => (
+                        <span
+                          key={label}
+                          className={`admin-reset-step ${adminResetStepIndex >= index ? 'active' : ''}`}
+                        >
+                          {label}
+                        </span>
+                      ))}
                     </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="dashboard-panel">
-              <div className="panel-head">
-                <div>
-                  <h2>Gallery</h2>
-                  <p>Add or remove clinic, doctor, and before/after images.</p>
-                </div>
-                <button type="button" className="panel-button" onClick={handleAddGalleryItem}>
-                  <i className="fa-solid fa-plus"></i>
-                  Add Photo
-                </button>
-              </div>
-
-              <div className="dashboard-stack">
-                {gallery.map((item) => (
-                  <article key={item.id} className="data-card">
-                    <div>
-                      <strong>{item.title}</strong>
-                      <p>{item.group}</p>
-                    </div>
-                    <div className="data-card-actions">
-                      <span className={`status-pill status-${statusClassName(item.status)}`}>{item.status}</span>
-                      <div className="table-actions">
-                        <button type="button" onClick={() => handleDeleteGalleryItem(item.id)}>
-                          Delete
-                        </button>
+                    <form className="panel-form" onSubmit={handleAdminResetSubmit}>
+                      {adminResetStep === 'email' && (
+                        <label>
+                          Admin email
+                          <input
+                            type="email"
+                            value={adminResetValues.email}
+                            onChange={(event) => {
+                              setAdminResetValues((current) => ({
+                                ...current,
+                                email: event.target.value,
+                              }));
+                              setAdminResetError('');
+                            }}
+                            placeholder="admin@clinic.com"
+                            required
+                          />
+                        </label>
+                      )}
+                      {adminResetStep === 'code' && (
+                        <label>
+                          Verification code
+                          <input
+                            type="text"
+                            value={adminResetValues.code}
+                            onChange={(event) => {
+                              setAdminResetValues((current) => ({
+                                ...current,
+                                code: event.target.value,
+                              }));
+                              setAdminResetError('');
+                            }}
+                            placeholder="Enter the 6-digit code"
+                            required
+                          />
+                        </label>
+                      )}
+                      {adminResetStep === 'password' && (
+                        <>
+                          <label>
+                            New password
+                            <input
+                              type="password"
+                              value={adminResetValues.newPassword}
+                              onChange={(event) => {
+                                setAdminResetValues((current) => ({
+                                  ...current,
+                                  newPassword: event.target.value,
+                                }));
+                                setAdminResetError('');
+                              }}
+                              placeholder="Enter a new password"
+                              required
+                            />
+                          </label>
+                          <label>
+                            Confirm new password
+                            <input
+                              type="password"
+                              value={adminResetValues.confirmPassword}
+                              onChange={(event) => {
+                                setAdminResetValues((current) => ({
+                                  ...current,
+                                  confirmPassword: event.target.value,
+                                }));
+                                setAdminResetError('');
+                              }}
+                              placeholder="Confirm new password"
+                              required
+                            />
+                          </label>
+                        </>
+                      )}
+                      {adminResetError && <p className="panel-error">{adminResetError}</p>}
+                      {adminResetMessage && <p className="panel-message">{adminResetMessage}</p>}
+                      <div className="panel-actions admin-reset-actions">
+                        {adminResetStep !== 'email' && adminResetStep !== 'done' && (
+                          <button type="button" className="btn btn-link" onClick={handleAdminResetBack}>
+                            Back
+                          </button>
+                        )}
+                        {adminResetStep === 'done' ? (
+                          <button type="button" className="btn btn-primary" onClick={handleAdminResetCancel}>
+                            Done
+                          </button>
+                        ) : (
+                          <button type="submit" className="btn btn-primary">
+                            {adminResetStep === 'email' && 'Send reset code'}
+                            {adminResetStep === 'code' && 'Verify code'}
+                            {adminResetStep === 'password' && 'Set new password'}
+                          </button>
+                        )}
                       </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="dashboard-panel">
-              <div className="panel-head">
-                <div>
-                  <h2>Services</h2>
-                  <p>Add, hide, or remove services and price cards.</p>
-                </div>
-                <button type="button" className="panel-button" onClick={handleAddService}>
-                  <i className="fa-solid fa-plus"></i>
-                  Add Service
-                </button>
-              </div>
-
-              <div className="dashboard-stack">
-                {serviceCatalog.map((service) => (
-                  <article key={service.id} className="data-card">
-                    <div>
-                      <strong>{service.title}</strong>
-                      <p>{service.price}</p>
-                    </div>
-                    <div className="data-card-actions">
-                      <span className={`status-pill status-${statusClassName(service.status)}`}>{service.status}</span>
-                      <div className="table-actions">
-                        <button type="button" onClick={() => handleToggleServiceStatus(service.id)}>
-                          {service.status === 'Live' ? 'Hide' : 'Publish'}
-                        </button>
-                        <button type="button" onClick={() => handleDeleteService(service.id)}>
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </div>
-        </section>
+                    </form>
+                    <button type="button" className="panel-link" onClick={handleAdminResetCancel}>
+                      Back to change password
+                    </button>
+                  </>
+                )}
+              </section>
+            )}
+          </section>
+        </div>
       </main>
     </div>
   );
