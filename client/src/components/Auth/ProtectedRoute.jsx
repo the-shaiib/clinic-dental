@@ -1,12 +1,13 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { ADMIN_AUTH_KEY } from '../../config/adminAuth';
+import { getAuthToken, getAuthUser } from '../../config/authStorage';
 
 function ProtectedRoute({ children }) {
   const location = useLocation();
-  const isAuthenticated = sessionStorage.getItem(ADMIN_AUTH_KEY) === '1';
+  const authUser = getAuthUser();
+  const isAuthenticated = Boolean(getAuthToken() && authUser?.isAdmin);
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/" replace state={{ from: location.pathname }} />;
   }
 
   return children;

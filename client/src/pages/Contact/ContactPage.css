@@ -147,6 +147,13 @@
   margin-top: 4px;
 }
 
+.contact-page .contact-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #b01231;
+  font-weight: 600;
+}
+
 .contact-page .appointment-confirmation {
   margin-top: 16px;
   padding: 16px;

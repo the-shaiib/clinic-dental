@@ -1,29 +1,28 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { clinicInfo } from '../../config/clinicInfo';
-import { GALLERY_ITEMS_KEY, loadGalleryItems } from '../../config/galleryItems';
-import { SERVICES_KEY, loadServices } from '../../config/servicesCatalog';
+import { fetchGallery, fetchServices } from '../../config/api';
 import mainImage from '../../assets/mainimg.png';
 import ResultSection from '../Result/ResultSection';
 import ReviewsSection from '../Reviews/ReviewsSection';
 import './HomePage.css';
 
 function HomePage() {
-  const [services, setServices] = useState(() => loadServices());
-  const [galleryItems, setGalleryItems] = useState(() => loadGalleryItems());
+  const [services, setServices] = useState([]);
+  const [galleryItems, setGalleryItems] = useState([]);
 
   useEffect(() => {
-    const handleStorage = (event) => {
-      if (event.key === GALLERY_ITEMS_KEY) {
-        setGalleryItems(loadGalleryItems());
-      }
-      if (event.key === SERVICES_KEY) {
-        setServices(loadServices());
+    const loadData = async () => {
+      try {
+        const [gallery, servicesList] = await Promise.all([fetchGallery(), fetchServices()]);
+        setGalleryItems(gallery);
+        setServices(servicesList);
+      } catch {
+        // API may not be ready yet.
       }
     };
 
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    loadData();
   }, []);
 
   return (
@@ -88,7 +87,7 @@ function HomePage() {
           {services.map((service) => (
             <article className="services-lite-card fade-up" key={service.title}>
               <div className="icon-shell">
-                <i className={service.icon}></i>
+                <i className={service.icon || 'fa-solid fa-tooth'}></i>
               </div>
               <h3>{service.title}</h3>
               <p>{service.description}</p>
@@ -114,8 +113,8 @@ function HomePage() {
           {galleryItems.map((item, index) => {
             const hasMeta = Boolean(item.title?.trim() || item.description?.trim());
             return (
-              <figure className="home-gallery-item" key={item.id ?? `${item.src}-${index}`}>
-                <img src={item.src} alt={item.title || 'Clinic gallery'} loading="lazy" />
+              <figure className="home-gallery-item" key={item._id ?? `${item.image}-${index}`}>
+                <img src={item.image} alt={item.title || 'Clinic gallery'} loading="lazy" />
                 {hasMeta ? (
                   <figcaption className="home-gallery-meta">
                     {item.title ? <strong>{item.title}</strong> : null}

@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
-import { BEFORE_AFTER_KEY, loadBeforeAfterCases } from '../../config/beforeAfterCases';
+import { fetchBeforeAfter } from '../../config/api';
 import './ResultSection.css';
 
 function ResultSection() {
-  const [beforeAfterCases, setBeforeAfterCases] = useState(() => loadBeforeAfterCases());
+  const [beforeAfterCases, setBeforeAfterCases] = useState([]);
 
   useEffect(() => {
-    const handleStorage = (event) => {
-      if (event.key === BEFORE_AFTER_KEY) {
-        setBeforeAfterCases(loadBeforeAfterCases());
+    const loadData = async () => {
+      try {
+        const data = await fetchBeforeAfter();
+        setBeforeAfterCases(data);
+      } catch {
+        // API may not be ready yet.
       }
     };
 
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    loadData();
   }, []);
 
   return (
@@ -26,7 +28,7 @@ function ResultSection() {
       <div className="result-grid">
         {beforeAfterCases.map((item, index) => (
           <article
-            key={item.id}
+            key={item._id}
             className="result-card fade-up"
             style={{ animationDelay: `${0.1 * (index + 1)}s` }}
           >

@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { getAuthUser } from '../../config/authStorage';
 import './Header.css';
 
 const THEME_STORAGE_KEY = 'clinic_theme';
@@ -22,6 +23,7 @@ const getInitialTheme = () => {
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => getInitialTheme() === 'dark');
+  const [authUser, setAuthUser] = useState(() => getAuthUser());
 
   useEffect(() => {
     const nextTheme = isDarkMode ? 'dark' : 'light';
@@ -54,9 +56,33 @@ function Header() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    const handleStorage = () => {
+      setAuthUser(getAuthUser());
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('auth-change', handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('auth-change', handleStorage);
+    };
+  }, []);
+
   const handleCloseMenu = () => {
     setIsMenuOpen(false);
   };
+
+
+  const profileInitials = useMemo(() => {
+    if (!authUser?.name) return 'U';
+    return authUser.name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0].toUpperCase())
+      .join('');
+  }, [authUser]);
 
   return (
     <>
@@ -97,9 +123,19 @@ function Header() {
               <i className={isDarkMode ? 'fa-regular fa-sun' : 'fa-regular fa-moon'}></i>
             </button>
 
-            <Link className="login-btn" to="/login" onClick={handleCloseMenu} aria-label="Login">
-              <i className="fa-solid fa-right-to-bracket"></i>
-            </Link>
+            {authUser ? (
+              <Link className="profile-btn" to="/dashboard" onClick={handleCloseMenu} aria-label="Profile">
+                {authUser.avatar ? (
+                  <img src={authUser.avatar} alt={authUser.name} />
+                ) : (
+                  <span>{profileInitials}</span>
+                )}
+              </Link>
+            ) : (
+              <Link className="login-btn" to="/login" onClick={handleCloseMenu} aria-label="Admin login">
+                <i className="fa-solid fa-right-to-bracket"></i>
+              </Link>
+            )}
 
             <button
               type="button"

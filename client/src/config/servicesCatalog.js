@@ -33,6 +33,22 @@ const defaultServices = [
     description:
       'Solutions d alignement pour corriger la position des dents avec un suivi progressif.',
   },
+  {
+    id: 'S-105',
+    title: 'Root Canal',
+    tag: 'Traitement en profondeur',
+    icon: 'fa-solid fa-syringe',
+    description:
+      'Soulage la douleur et sauve la dent avec un traitement precis, suivi et controle.',
+  },
+  {
+    id: 'S-106',
+    title: 'Pediatric Care',
+    tag: 'Soins enfants',
+    icon: 'fa-solid fa-toothbrush',
+    description:
+      'Approche douce pour les enfants, prevention, conseils, et suivi rassurant.',
+  },
 ];
 
 const normalizeServices = (items) =>
@@ -53,8 +69,7 @@ export const loadServices = () => {
     if (!stored) return defaultServices;
     const parsed = JSON.parse(stored);
     if (!Array.isArray(parsed)) return defaultServices;
-    const normalized = normalizeServices(parsed);
-    return normalized.length > 0 ? normalized : defaultServices;
+    return normalizeServices(parsed);
   } catch (error) {
     return defaultServices;
   }

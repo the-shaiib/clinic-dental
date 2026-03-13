@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { clinicInfo } from '../../config/clinicInfo';
-import { loadContactRequests, saveContactRequests } from '../../config/contactRequests';
+import { createContactRequest } from '../../config/api';
 import './ContactPage.css';
 
 function ContactPage() {
@@ -10,6 +10,7 @@ function ContactPage() {
     message: '',
   });
   const [confirmation, setConfirmation] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (field) => (event) => {
     setFormData((currentState) => ({
@@ -18,7 +19,7 @@ function ContactPage() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const name = formData.name.trim();
@@ -29,28 +30,29 @@ function ContactPage() {
       return;
     }
 
+    let savedRequest = null;
+    try {
+      savedRequest = await createContactRequest({ name, phone, message });
+    } catch {
+      setErrorMessage('We could not send your request. Please try again.');
+      return;
+    }
+
     const reference = `RDV-${Date.now().toString().slice(-6)}`;
-    const date = new Date().toLocaleDateString('en-US', {
+    const date = new Date(savedRequest.createdAt || Date.now()).toLocaleDateString('en-US', {
       month: 'short',
       day: '2-digit',
       year: 'numeric',
     });
 
-    const newRequest = {
-      id: `C-${Date.now().toString().slice(-6)}`,
+    setConfirmation({
       name,
       phone,
       message,
       date,
-    };
-
-    const updatedRequests = [newRequest, ...loadContactRequests()];
-    saveContactRequests(updatedRequests);
-
-    setConfirmation({
-      ...newRequest,
       reference,
     });
+    setErrorMessage('');
 
     setFormData({
       name: '',
@@ -137,6 +139,7 @@ function ContactPage() {
             <i className="fa-solid fa-calendar-check"></i>
             Confirm Appointment
           </button>
+          {errorMessage ? <p className="contact-error">{errorMessage}</p> : null}
         </form>
 
         {confirmation ? (

@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
-import { ADMIN_AUTH_KEY } from '../../config/adminAuth';
-import { CONTACT_REQUESTS_KEY, loadContactRequests } from '../../config/contactRequests';
-import { loadGalleryItems, saveGalleryItems } from '../../config/galleryItems';
-import { loadBeforeAfterCases, saveBeforeAfterCases } from '../../config/beforeAfterCases';
+import {
+  createBeforeAfter,
+  createGalleryItem as createGalleryItemApi,
+  createService as createServiceApi,
+  deleteBeforeAfter as deleteBeforeAfterApi,
+  deleteGalleryItem as deleteGalleryItemApi,
+  deleteService as deleteServiceApi,
+  fetchBeforeAfter,
+  fetchContactRequests,
+  fetchGallery,
+  fetchServices,
+  changePassword,
+} from '../../config/api';
+import { clearAuthSession } from '../../config/authStorage';
 import './DashboardPage.css';
-
-const initialServices = [
-  { id: 'S-1', title: 'Cleaning & Prevention', price: 'From 300 MAD', status: 'Live' },
-  { id: 'S-2', title: 'Whitening', price: 'From 1200 MAD', status: 'Live' },
-  { id: 'S-3', title: 'Implants', price: 'From 6500 MAD', status: 'Hidden' },
-];
-
-const statusClassName = (status) => status.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
 const readFileAsDataUrl = (file) =>
   new Promise((resolve, reject) => {
@@ -33,13 +35,37 @@ const toWhatsappNumber = (raw) => {
   return digits;
 };
 
+const DASHBOARD_SECTION_KEY = 'clinic_dashboard_section';
+const allowedSections = new Set([
+  'gallery-upload',
+  'before-after',
+  'contact-requests',
+  'services',
+  'change-password',
+]);
+
+const serviceIconOptions = [
+  { value: 'fa-solid fa-tooth', label: 'Tooth' },
+  { value: 'fa-solid fa-shield-heart', label: 'Care shield' },
+  { value: 'fa-solid fa-wand-magic-sparkles', label: 'Whitening' },
+  { value: 'fa-solid fa-teeth', label: 'Orthodontics' },
+  { value: 'fa-solid fa-teeth-open', label: 'Smile care' },
+  { value: 'fa-solid fa-toothbrush', label: 'Hygiene' },
+  { value: 'fa-solid fa-stethoscope', label: 'Consultation' },
+  { value: 'fa-solid fa-syringe', label: 'Treatment' },
+];
+
 function DashboardPage() {
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState('gallery-upload');
-  const [beforeAfterItems, setBeforeAfterItems] = useState(() => loadBeforeAfterCases());
-  const [services, setServices] = useState(initialServices);
-  const [contactRequests, setContactRequests] = useState(() => loadContactRequests());
-  const [galleryItems, setGalleryItems] = useState(() => loadGalleryItems());
+  const [activeSection, setActiveSection] = useState(() => {
+    if (typeof window === 'undefined') return 'gallery-upload';
+    const stored = window.localStorage.getItem(DASHBOARD_SECTION_KEY);
+    return stored && allowedSections.has(stored) ? stored : 'gallery-upload';
+  });
+  const [beforeAfterItems, setBeforeAfterItems] = useState([]);
+  const [services, setServices] = useState([]);
+  const [contactRequests, setContactRequests] = useState([]);
+  const [galleryItems, setGalleryItems] = useState([]);
   const [galleryForm, setGalleryForm] = useState({
     title: '',
     description: '',
@@ -51,7 +77,12 @@ function DashboardPage() {
     beforeFile: null,
     afterFile: null,
   });
-  const [serviceForm, setServiceForm] = useState({ title: '', price: '' });
+  const [serviceForm, setServiceForm] = useState({
+    title: '',
+    description: '',
+    tag: '',
+    icon: 'fa-solid fa-tooth',
+  });
   const galleryFileRef = useRef(null);
   const beforeFileRef = useRef(null);
   const afterFileRef = useRef(null);
@@ -61,30 +92,41 @@ function DashboardPage() {
     confirmPassword: '',
   });
   const [showAdminReset, setShowAdminReset] = useState(false);
-  const [adminResetStep, setAdminResetStep] = useState('email');
-  const [adminResetValues, setAdminResetValues] = useState({
-    email: '',
-    code: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
-  const [adminResetMessage, setAdminResetMessage] = useState('');
-  const [adminResetError, setAdminResetError] = useState('');
+  const [passwordStatus, setPasswordStatus] = useState({ message: '', error: '' });
 
   useEffect(() => {
-    const handleStorage = (event) => {
-      if (event.key === CONTACT_REQUESTS_KEY) {
-        setContactRequests(loadContactRequests());
+    const loadData = async () => {
+      try {
+        const [gallery, beforeAfter, servicesList, contacts] = await Promise.all([
+          fetchGallery(),
+          fetchBeforeAfter(),
+          fetchServices(),
+          fetchContactRequests(),
+        ]);
+        setGalleryItems(gallery);
+        setBeforeAfterItems(beforeAfter);
+        setServices(servicesList);
+        setContactRequests(contacts);
+      } catch {
+        // Silent fail: API may not be ready yet.
       }
     };
 
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    loadData();
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(DASHBOARD_SECTION_KEY, activeSection);
+  }, [activeSection]);
+
   const handleLogout = () => {
-    sessionStorage.removeItem(ADMIN_AUTH_KEY);
+    clearAuthSession();
     navigate('/', { replace: true });
+  };
+
+  const handleSectionChange = (section) => {
+    setActiveSection(section);
   };
 
   const handleAddGallery = async (event) => {
@@ -96,18 +138,19 @@ function DashboardPage() {
     let src = '';
     try {
       src = await readFileAsDataUrl(galleryForm.file);
-    } catch (error) {
+    } catch {
       return;
     }
-    const newItem = {
-      id: `G-${Date.now().toString().slice(-6)}`,
-      src,
-      title,
-      description,
-    };
-    const updatedItems = [newItem, ...galleryItems];
-    setGalleryItems(updatedItems);
-    saveGalleryItems(updatedItems);
+    try {
+      const created = await createGalleryItemApi({
+        title,
+        description,
+        image: src,
+      });
+      setGalleryItems((current) => [created, ...current]);
+    } catch {
+      return;
+    }
 
     setGalleryForm({ title: '', description: '', file: null });
     if (galleryFileRef.current) {
@@ -115,12 +158,13 @@ function DashboardPage() {
     }
   };
 
-  const handleDeleteGalleryItem = (id) => {
-    setGalleryItems((current) => {
-      const updated = current.filter((item) => item.id !== id);
-      saveGalleryItems(updated);
-      return updated;
-    });
+  const handleDeleteGalleryItem = async (id) => {
+    try {
+      await deleteGalleryItemApi(id);
+      setGalleryItems((current) => current.filter((item) => item._id !== id));
+    } catch {
+      return;
+    }
   };
 
   const handleAddBeforeAfter = async (event) => {
@@ -136,24 +180,21 @@ function DashboardPage() {
         readFileAsDataUrl(beforeAfterForm.beforeFile),
         readFileAsDataUrl(beforeAfterForm.afterFile),
       ]);
-    } catch (error) {
+    } catch {
       return;
     }
 
-    const newCase = {
-      id: `BA-${Date.now().toString().slice(-6)}`,
-      title,
-      note,
-      beforeImage,
-      afterImage,
-      createdAt: new Date().toISOString(),
-    };
-
-    setBeforeAfterItems((current) => {
-      const updated = [newCase, ...current];
-      saveBeforeAfterCases(updated);
-      return updated;
-    });
+    try {
+      const created = await createBeforeAfter({
+        title,
+        note,
+        beforeImage,
+        afterImage,
+      });
+      setBeforeAfterItems((current) => [created, ...current]);
+    } catch {
+      return;
+    }
 
     setBeforeAfterForm({
       title: '',
@@ -165,127 +206,74 @@ function DashboardPage() {
     if (afterFileRef.current) afterFileRef.current.value = '';
   };
 
-  const handleDeleteBeforeAfter = (id) => {
-    setBeforeAfterItems((current) => {
-      const updated = current.filter((item) => item.id !== id);
-      saveBeforeAfterCases(updated);
-      return updated;
-    });
+  const handleDeleteBeforeAfter = async (id) => {
+    try {
+      await deleteBeforeAfterApi(id);
+      setBeforeAfterItems((current) => current.filter((item) => item._id !== id));
+    } catch {
+      return;
+    }
   };
 
-  const handleAddService = (event) => {
+  const handleAddService = async (event) => {
     event.preventDefault();
     const title = serviceForm.title.trim();
-    const price = serviceForm.price.trim();
-    if (!title || !price) return;
-    setServices((current) => [
-      { id: `S-${current.length + 1}`, title, price, status: 'Draft' },
-      ...current,
-    ]);
-    setServiceForm({ title: '', price: '' });
-  };
+    const description = serviceForm.description.trim();
+    const tag = serviceForm.tag.trim();
+    if (!title || !description) return;
 
-  const handleToggleService = (id) => {
-    setServices((current) =>
-      current.map((service) =>
-        service.id === id
-          ? { ...service, status: service.status === 'Live' ? 'Hidden' : 'Live' }
-          : service
-      )
-    );
-  };
-
-  const handleDeleteService = (id) => {
-    setServices((current) => current.filter((service) => service.id !== id));
-  };
-
-  const handlePasswordSubmit = (event) => {
-    event.preventDefault();
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  };
-
-  const resetAdminFlow = () => {
-    setAdminResetValues({
-      email: '',
-      code: '',
-      newPassword: '',
-      confirmPassword: '',
+    try {
+      const created = await createServiceApi({
+        title,
+        description,
+        tag,
+        icon: serviceForm.icon,
+      });
+      setServices((current) => [created, ...current]);
+    } catch {
+      return;
+    }
+    setServiceForm({
+      title: '',
+      description: '',
+      tag: '',
+      icon: serviceIconOptions[0].value,
     });
-    setAdminResetMessage('');
-    setAdminResetError('');
-    setAdminResetStep('email');
   };
 
-  const handleAdminResetStart = () => {
-    resetAdminFlow();
-    setShowAdminReset(true);
-  };
-
-  const handleAdminResetCancel = () => {
-    resetAdminFlow();
-    setShowAdminReset(false);
-  };
-
-  const handleAdminResetBack = () => {
-    setAdminResetMessage('');
-    setAdminResetError('');
-    if (adminResetStep === 'code') {
-      setAdminResetStep('email');
+  const handleDeleteService = async (id) => {
+    try {
+      await deleteServiceApi(id);
+      setServices((current) => current.filter((service) => service._id !== id));
+    } catch {
       return;
     }
-    if (adminResetStep === 'password') {
-      setAdminResetStep('code');
-    }
   };
 
-  const handleAdminResetSubmit = (event) => {
+  const handleChangePasswordSubmit = async (event) => {
     event.preventDefault();
-    setAdminResetError('');
-
-    if (adminResetStep === 'email') {
-      const email = adminResetValues.email.trim();
-      if (!email) {
-        setAdminResetError('Please enter your admin email.');
-        return;
-      }
-      setAdminResetMessage(`We sent a reset code to ${email}.`);
-      setAdminResetStep('code');
+    const currentPassword = passwordForm.currentPassword.trim();
+    const newPassword = passwordForm.newPassword.trim();
+    const confirmPassword = passwordForm.confirmPassword.trim();
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordStatus({ message: '', error: 'Fill every password field.' });
       return;
     }
-
-    if (adminResetStep === 'code') {
-      const code = adminResetValues.code.trim();
-      if (!code) {
-        setAdminResetError('Please enter the verification code.');
-        return;
-      }
-      setAdminResetMessage('Code verified. Create a new password.');
-      setAdminResetStep('password');
+    if (newPassword !== confirmPassword) {
+      setPasswordStatus({ message: '', error: 'New passwords do not match.' });
       return;
     }
-
-    if (adminResetStep === 'password') {
-      const newPassword = adminResetValues.newPassword.trim();
-      const confirmPassword = adminResetValues.confirmPassword.trim();
-      if (!newPassword || !confirmPassword) {
-        setAdminResetError('Please fill in all fields.');
-        return;
-      }
-      if (newPassword !== confirmPassword) {
-        setAdminResetError('Passwords do not match.');
-        return;
-      }
-      setAdminResetMessage('Admin password updated successfully.');
-      setAdminResetStep('done');
+    try {
+      await changePassword({ currentPassword, newPassword });
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setPasswordStatus({ message: 'Password updated successfully.', error: '' });
+    } catch (err) {
+      setPasswordStatus({
+        message: '',
+        error: err.response?.data?.message || 'Unable to change password.',
+      });
     }
   };
-
-  const adminResetStepIndex = {
-    email: 0,
-    code: 1,
-    password: 2,
-    done: 3,
-  }[adminResetStep];
 
   return (
     <div className="site-shell dashboard-route">
@@ -302,35 +290,35 @@ function DashboardPage() {
               <button
                 type="button"
                 className={activeSection === 'gallery-upload' ? 'active' : ''}
-                onClick={() => setActiveSection('gallery-upload')}
+                onClick={() => handleSectionChange('gallery-upload')}
               >
                 Add gallery image
               </button>
               <button
                 type="button"
                 className={activeSection === 'before-after' ? 'active' : ''}
-                onClick={() => setActiveSection('before-after')}
+                onClick={() => handleSectionChange('before-after')}
               >
                 Before / After
               </button>
               <button
                 type="button"
                 className={activeSection === 'contact-requests' ? 'active' : ''}
-                onClick={() => setActiveSection('contact-requests')}
+                onClick={() => handleSectionChange('contact-requests')}
               >
                 Contact requests
               </button>
               <button
                 type="button"
                 className={activeSection === 'services' ? 'active' : ''}
-                onClick={() => setActiveSection('services')}
+                onClick={() => handleSectionChange('services')}
               >
                 Services
               </button>
               <button
                 type="button"
                 className={activeSection === 'change-password' ? 'active' : ''}
-                onClick={() => setActiveSection('change-password')}
+                onClick={() => handleSectionChange('change-password')}
               >
                 Change password
               </button>
@@ -416,9 +404,9 @@ function DashboardPage() {
                     <p className="panel-helper">No gallery images yet.</p>
                   ) : (
                     galleryItems.map((item) => (
-                      <article key={item.id} className="panel-card gallery-card">
+                      <article key={item._id} className="panel-card gallery-card">
                         <div className="gallery-thumb">
-                          <img src={item.src} alt={item.title || 'Gallery item'} loading="lazy" />
+                          <img src={item.image} alt={item.title || 'Gallery item'} loading="lazy" />
                         </div>
                         <div className="gallery-info">
                           <strong>{item.title || 'Untitled image'}</strong>
@@ -426,7 +414,7 @@ function DashboardPage() {
                         </div>
                         <div className="card-actions">
                           <div className="mini-actions">
-                            <button type="button" className="danger" onClick={() => handleDeleteGalleryItem(item.id)}>
+                            <button type="button" className="danger" onClick={() => handleDeleteGalleryItem(item._id)}>
                               Delete
                             </button>
                           </div>
@@ -526,7 +514,7 @@ function DashboardPage() {
                     <p className="panel-helper">No cases yet.</p>
                   ) : (
                     beforeAfterItems.map((item) => (
-                      <article key={item.id} className="panel-card before-after-card">
+                      <article key={item._id} className="panel-card before-after-card">
                         <div className="before-after-preview">
                           <img
                             src={item.beforeImage}
@@ -548,7 +536,7 @@ function DashboardPage() {
                             <button
                               type="button"
                               className="danger"
-                              onClick={() => handleDeleteBeforeAfter(item.id)}
+                              onClick={() => handleDeleteBeforeAfter(item._id)}
                             >
                               Delete
                             </button>
@@ -574,7 +562,7 @@ function DashboardPage() {
                     <p className="panel-helper">No contact requests yet.</p>
                   ) : (
                     contactRequests.map((request) => (
-                      <article key={request.id} className="panel-card request-card">
+                      <article key={request._id} className="panel-card request-card">
                         <div className="request-person">
                           <strong className="request-name">{request.name}</strong>
                           {toWhatsappNumber(request.phone) ? (
@@ -596,7 +584,15 @@ function DashboardPage() {
                           )}
                         </div>
                         <p className="request-message">{request.message}</p>
-                        <small className="request-date">{request.date}</small>
+                        <small className="request-date">
+                          {request.createdAt
+                            ? new Date(request.createdAt).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: '2-digit',
+                                year: 'numeric',
+                              })
+                            : ''}
+                        </small>
                       </article>
                     ))
                   )}
@@ -609,62 +605,98 @@ function DashboardPage() {
                 <div className="panel-head">
                   <div>
                     <h2>Services</h2>
-                    <p>Add, hide, or delete services.</p>
+                    <p>Control how services appear on the homepage. The button always links to contact.</p>
                   </div>
                 </div>
-                <form className="panel-form" onSubmit={handleAddService}>
+                <form className="panel-form panel-form-wide" onSubmit={handleAddService}>
                   <label>
-                    Service name
+                    Service title
                     <input
                       type="text"
                       value={serviceForm.title}
                       onChange={(event) =>
                         setServiceForm((current) => ({ ...current, title: event.target.value }))
                       }
-                      placeholder="Root canal"
+                      placeholder="Root canal therapy"
                       required
                     />
                   </label>
                   <label>
-                    Price
+                    Service description
+                    <textarea
+                      rows="4"
+                      value={serviceForm.description}
+                      onChange={(event) =>
+                        setServiceForm((current) => ({ ...current, description: event.target.value }))
+                      }
+                      placeholder="Short, clear description of the service."
+                      required
+                    ></textarea>
+                  </label>
+                  <label>
+                    Service category (optional)
                     <input
                       type="text"
-                      value={serviceForm.price}
+                      value={serviceForm.tag}
                       onChange={(event) =>
-                        setServiceForm((current) => ({ ...current, price: event.target.value }))
+                        setServiceForm((current) => ({ ...current, tag: event.target.value }))
                       }
-                      placeholder="From 0 MAD"
-                      required
+                      placeholder="Esthetique du sourire"
                     />
                   </label>
-                  <div className="panel-actions">
+                  <label>
+                    Icon style
+                    <div className="icon-picker">
+                      {serviceIconOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          title={option.label}
+                          aria-label={option.label}
+                          className={`icon-choice ${serviceForm.icon === option.value ? 'active' : ''}`}
+                          onClick={() =>
+                            setServiceForm((current) => ({ ...current, icon: option.value }))
+                          }
+                        >
+                          <i className={option.value}></i>
+                        </button>
+                      ))}
+                    </div>
+                  </label>
+                  <div className="panel-actions field-wide">
                     <button type="submit" className="btn btn-primary">
                       Add service
                     </button>
                   </div>
                 </form>
-                <div className="panel-list">
-                  {services.map((service) => (
-                    <article key={service.id} className="panel-card">
-                      <div>
-                        <strong>{service.title}</strong>
-                        <p>{service.price}</p>
-                      </div>
-                      <div className="card-actions">
-                        <span className={`status-pill status-${statusClassName(service.status)}`}>
-                          {service.status}
-                        </span>
-                        <div className="mini-actions">
-                          <button type="button" onClick={() => handleToggleService(service.id)}>
-                            {service.status === 'Live' ? 'Hide' : 'Publish'}
-                          </button>
-                          <button type="button" className="danger" onClick={() => handleDeleteService(service.id)}>
-                            Delete
-                          </button>
+                <div className="panel-list service-list">
+                  {services.length === 0 ? (
+                    <p className="panel-helper">No services yet.</p>
+                  ) : (
+                    services.map((service) => (
+                      <article key={service._id} className="panel-card service-card">
+                        <div className="service-icon">
+                          <i className={service.icon || 'fa-solid fa-tooth'}></i>
                         </div>
-                      </div>
-                    </article>
-                  ))}
+                        <div className="service-info">
+                          <strong>{service.title}</strong>
+                          <p>{service.description}</p>
+                          {service.tag ? <span className="service-tag">{service.tag}</span> : null}
+                        </div>
+                        <div className="card-actions">
+                          <div className="mini-actions">
+                            <button
+                              type="button"
+                              className="danger"
+                              onClick={() => handleDeleteService(service._id)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    ))
+                  )}
                 </div>
               </section>
             )}
@@ -674,181 +706,54 @@ function DashboardPage() {
                 <div className="panel-head">
                   <div>
                     <h2>Change password</h2>
-                    <p>Update your admin password.</p>
+                    <p>Keep your admin password in sync with the database.</p>
                   </div>
                 </div>
-                {!showAdminReset ? (
-                  <>
-                    <form className="panel-form" onSubmit={handlePasswordSubmit}>
-                      <label>
-                        Current password
-                        <input
-                          type="password"
-                          value={passwordForm.currentPassword}
-                          onChange={(event) =>
-                            setPasswordForm((current) => ({
-                              ...current,
-                              currentPassword: event.target.value,
-                            }))
-                          }
-                          placeholder="Enter current password"
-                          required
-                        />
-                      </label>
-                      <label>
-                        New password
-                        <input
-                          type="password"
-                          value={passwordForm.newPassword}
-                          onChange={(event) =>
-                            setPasswordForm((current) => ({
-                              ...current,
-                              newPassword: event.target.value,
-                            }))
-                          }
-                          placeholder="Enter new password"
-                          required
-                        />
-                      </label>
-                      <label>
-                        Confirm new password
-                        <input
-                          type="password"
-                          value={passwordForm.confirmPassword}
-                          onChange={(event) =>
-                            setPasswordForm((current) => ({
-                              ...current,
-                              confirmPassword: event.target.value,
-                            }))
-                          }
-                          placeholder="Confirm new password"
-                          required
-                        />
-                      </label>
-                      <div className="panel-actions">
-                        <button type="submit" className="btn btn-primary">
-                          Save password
-                        </button>
-                      </div>
-                    </form>
-                    <p className="panel-helper">
-                      Forgot your admin password?{' '}
-                      <button type="button" className="panel-link" onClick={handleAdminResetStart}>
-                        Reset with email
-                      </button>
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <div className="admin-reset-steps" aria-hidden="true">
-                      {['Email', 'Verify', 'New password'].map((label, index) => (
-                        <span
-                          key={label}
-                          className={`admin-reset-step ${adminResetStepIndex >= index ? 'active' : ''}`}
-                        >
-                          {label}
-                        </span>
-                      ))}
-                    </div>
-                    <form className="panel-form" onSubmit={handleAdminResetSubmit}>
-                      {adminResetStep === 'email' && (
-                        <label>
-                          Admin email
-                          <input
-                            type="email"
-                            value={adminResetValues.email}
-                            onChange={(event) => {
-                              setAdminResetValues((current) => ({
-                                ...current,
-                                email: event.target.value,
-                              }));
-                              setAdminResetError('');
-                            }}
-                            placeholder="admin@clinic.com"
-                            required
-                          />
-                        </label>
-                      )}
-                      {adminResetStep === 'code' && (
-                        <label>
-                          Verification code
-                          <input
-                            type="text"
-                            value={adminResetValues.code}
-                            onChange={(event) => {
-                              setAdminResetValues((current) => ({
-                                ...current,
-                                code: event.target.value,
-                              }));
-                              setAdminResetError('');
-                            }}
-                            placeholder="Enter the 6-digit code"
-                            required
-                          />
-                        </label>
-                      )}
-                      {adminResetStep === 'password' && (
-                        <>
-                          <label>
-                            New password
-                            <input
-                              type="password"
-                              value={adminResetValues.newPassword}
-                              onChange={(event) => {
-                                setAdminResetValues((current) => ({
-                                  ...current,
-                                  newPassword: event.target.value,
-                                }));
-                                setAdminResetError('');
-                              }}
-                              placeholder="Enter a new password"
-                              required
-                            />
-                          </label>
-                          <label>
-                            Confirm new password
-                            <input
-                              type="password"
-                              value={adminResetValues.confirmPassword}
-                              onChange={(event) => {
-                                setAdminResetValues((current) => ({
-                                  ...current,
-                                  confirmPassword: event.target.value,
-                                }));
-                                setAdminResetError('');
-                              }}
-                              placeholder="Confirm new password"
-                              required
-                            />
-                          </label>
-                        </>
-                      )}
-                      {adminResetError && <p className="panel-error">{adminResetError}</p>}
-                      {adminResetMessage && <p className="panel-message">{adminResetMessage}</p>}
-                      <div className="panel-actions admin-reset-actions">
-                        {adminResetStep !== 'email' && adminResetStep !== 'done' && (
-                          <button type="button" className="btn btn-link" onClick={handleAdminResetBack}>
-                            Back
-                          </button>
-                        )}
-                        {adminResetStep === 'done' ? (
-                          <button type="button" className="btn btn-primary" onClick={handleAdminResetCancel}>
-                            Done
-                          </button>
-                        ) : (
-                          <button type="submit" className="btn btn-primary">
-                            {adminResetStep === 'email' && 'Send reset code'}
-                            {adminResetStep === 'code' && 'Verify code'}
-                            {adminResetStep === 'password' && 'Set new password'}
-                          </button>
-                        )}
-                      </div>
-                    </form>
-                    <button type="button" className="panel-link" onClick={handleAdminResetCancel}>
-                      Back to change password
+                <form className="panel-form" onSubmit={handleChangePasswordSubmit}>
+                  <label>
+                    Current password
+                    <input
+                      type="password"
+                      value={passwordForm.currentPassword}
+                      onChange={(event) =>
+                        setPasswordForm((current) => ({ ...current, currentPassword: event.target.value }))
+                      }
+                      placeholder="Enter current password"
+                      required
+                    />
+                  </label>
+                  <label>
+                    New password
+                    <input
+                      type="password"
+                      value={passwordForm.newPassword}
+                      onChange={(event) =>
+                        setPasswordForm((current) => ({ ...current, newPassword: event.target.value }))
+                      }
+                      placeholder="Enter new password"
+                      required
+                    />
+                  </label>
+                  <label>
+                    Confirm new password
+                    <input
+                      type="password"
+                      value={passwordForm.confirmPassword}
+                      onChange={(event) =>
+                        setPasswordForm((current) => ({ ...current, confirmPassword: event.target.value }))
+                      }
+                      placeholder="Confirm new password"
+                      required
+                    />
+                  </label>
+                  {passwordStatus.error && <p className="panel-error">{passwordStatus.error}</p>}
+                  {passwordStatus.message && <p className="panel-message">{passwordStatus.message}</p>}
+                  <div className="panel-actions">
+                    <button type="submit" className="btn btn-primary">
+                      Update password
                     </button>
-                  </>
-                )}
+                  </div>
+                </form>
               </section>
             )}
           </section>

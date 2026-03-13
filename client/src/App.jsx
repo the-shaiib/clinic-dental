@@ -5,10 +5,8 @@ import SiteLayout from './components/Layout/SiteLayout';
 import AboutPage from './pages/About/AboutPage';
 import ContactPage from './pages/Contact/ContactPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
-import ForgotPasswordPage from './pages/ForgotPassword/ForgotPasswordPage';
 import HomePage from './pages/Home/HomePage';
 import LoginPage from './pages/Login/LoginPage';
-import ResetPasswordPage from './pages/ResetPassword/ResetPasswordPage';
 
 function App() {
   return (
@@ -21,9 +19,6 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<LoginPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/dashboard"
           element={
