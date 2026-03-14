@@ -5,6 +5,7 @@ const User = require('../models/User');
 const signToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
+
 const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -106,6 +107,7 @@ const adminLogin = async (req, res) => {
     return res.status(500).json({ message: 'Server error during admin login.' });
   }
 };
+
 
 const changePassword = async (req, res) => {
   try {

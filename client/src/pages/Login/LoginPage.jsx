@@ -71,7 +71,9 @@ function LoginPage() {
                 />
               </label>
               {errorMessage && <p className="auth-error">{errorMessage}</p>}
-              <button type="submit" className="auth-submit">Log in</button>
+              <button type="submit" className="auth-submit">
+                Log in
+              </button>
             </form>
 
             <p className="auth-footnote">Need help? Contact support.</p>

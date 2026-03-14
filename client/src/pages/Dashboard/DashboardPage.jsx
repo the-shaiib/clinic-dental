@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import {
@@ -16,6 +17,46 @@ import {
 } from '../../config/api';
 import { clearAuthSession } from '../../config/authStorage';
 import './DashboardPage.css';
+
+const useConfirmDialog = () => {
+  const [state, setState] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmLabel: 'Yes, delete',
+    cancelLabel: 'Cancel',
+    onConfirm: null,
+  });
+
+  const openConfirm = ({ title, message, confirmLabel, cancelLabel, onConfirm }) => {
+    setState({
+      isOpen: true,
+      title,
+      message,
+      confirmLabel: confirmLabel || 'Yes, delete',
+      cancelLabel: cancelLabel || 'Cancel',
+      onConfirm,
+    });
+  };
+
+  const closeConfirm = () => {
+    setState((current) => ({ ...current, isOpen: false, onConfirm: null }));
+  };
+
+  const handleConfirm = () => {
+    if (typeof state.onConfirm === 'function') {
+      state.onConfirm();
+    }
+    closeConfirm();
+  };
+
+  return {
+    confirmState: state,
+    openConfirm,
+    closeConfirm,
+    handleConfirm,
+  };
+};
 
 const readFileAsDataUrl = (file) =>
   new Promise((resolve, reject) => {
@@ -57,6 +98,7 @@ const serviceIconOptions = [
 
 function DashboardPage() {
   const navigate = useNavigate();
+  const { confirmState, openConfirm, closeConfirm, handleConfirm } = useConfirmDialog();
   const [activeSection, setActiveSection] = useState(() => {
     if (typeof window === 'undefined') return 'gallery-upload';
     const stored = window.localStorage.getItem(DASHBOARD_SECTION_KEY);
@@ -121,8 +163,16 @@ function DashboardPage() {
   }, [activeSection]);
 
   const handleLogout = () => {
-    clearAuthSession();
-    navigate('/', { replace: true });
+    openConfirm({
+      title: 'Confirm logout',
+      message: 'Are you sure you want to log out from the admin dashboard?',
+      confirmLabel: 'Yes, log out',
+      cancelLabel: 'Cancel',
+      onConfirm: () => {
+        clearAuthSession();
+        navigate('/', { replace: true });
+      },
+    });
   };
 
   const handleSectionChange = (section) => {
@@ -159,12 +209,20 @@ function DashboardPage() {
   };
 
   const handleDeleteGalleryItem = async (id) => {
-    try {
-      await deleteGalleryItemApi(id);
-      setGalleryItems((current) => current.filter((item) => item._id !== id));
-    } catch {
-      return;
-    }
+    openConfirm({
+      title: 'Delete gallery image',
+      message: 'This image will be removed from the website. Are you sure?',
+      confirmLabel: 'Yes, delete',
+      cancelLabel: 'Cancel',
+      onConfirm: async () => {
+        try {
+          await deleteGalleryItemApi(id);
+          setGalleryItems((current) => current.filter((item) => item._id !== id));
+        } catch {
+          return;
+        }
+      },
+    });
   };
 
   const handleAddBeforeAfter = async (event) => {
@@ -207,12 +265,20 @@ function DashboardPage() {
   };
 
   const handleDeleteBeforeAfter = async (id) => {
-    try {
-      await deleteBeforeAfterApi(id);
-      setBeforeAfterItems((current) => current.filter((item) => item._id !== id));
-    } catch {
-      return;
-    }
+    openConfirm({
+      title: 'Delete before & after case',
+      message: 'This case will be removed from the website. Are you sure?',
+      confirmLabel: 'Yes, delete',
+      cancelLabel: 'Cancel',
+      onConfirm: async () => {
+        try {
+          await deleteBeforeAfterApi(id);
+          setBeforeAfterItems((current) => current.filter((item) => item._id !== id));
+        } catch {
+          return;
+        }
+      },
+    });
   };
 
   const handleAddService = async (event) => {
@@ -242,12 +308,20 @@ function DashboardPage() {
   };
 
   const handleDeleteService = async (id) => {
-    try {
-      await deleteServiceApi(id);
-      setServices((current) => current.filter((service) => service._id !== id));
-    } catch {
-      return;
-    }
+    openConfirm({
+      title: 'Delete service',
+      message: 'This service will be removed from the website. Are you sure?',
+      confirmLabel: 'Yes, delete',
+      cancelLabel: 'Cancel',
+      onConfirm: async () => {
+        try {
+          await deleteServiceApi(id);
+          setServices((current) => current.filter((service) => service._id !== id));
+        } catch {
+          return;
+        }
+      },
+    });
   };
 
   const handleChangePasswordSubmit = async (event) => {
@@ -759,6 +833,27 @@ function DashboardPage() {
           </section>
         </div>
       </main>
+      {confirmState.isOpen && typeof document !== 'undefined'
+        ? createPortal(
+            <div className="confirm-overlay" role="dialog" aria-modal="true">
+              <div className="confirm-modal">
+                <div className="confirm-head">
+                  <h3>{confirmState.title}</h3>
+                  <p>{confirmState.message}</p>
+                </div>
+                <div className="confirm-actions">
+                  <button type="button" className="btn btn-link" onClick={closeConfirm}>
+                    {confirmState.cancelLabel}
+                  </button>
+                  <button type="button" className="btn btn-primary" onClick={handleConfirm}>
+                    {confirmState.confirmLabel}
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
     </div>
   );
 }

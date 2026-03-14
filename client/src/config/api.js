@@ -80,3 +80,13 @@ export const changePassword = async (payload) => {
   const response = await apiClient.post('/api/auth/password', payload);
   return response.data;
 };
+
+export const requestResetCode = async (email) => {
+  const response = await apiClient.post('/api/auth/reset-request', { email });
+  return response.data;
+};
+
+export const completeReset = async (payload) => {
+  const response = await apiClient.post('/api/auth/reset-complete', payload);
+  return response.data;
+};

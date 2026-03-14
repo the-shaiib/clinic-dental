@@ -114,7 +114,11 @@ function HomePage() {
             const hasMeta = Boolean(item.title?.trim() || item.description?.trim());
             return (
               <figure className="home-gallery-item" key={item._id ?? `${item.image}-${index}`}>
-                <img src={item.image} alt={item.title || 'Clinic gallery'} loading="lazy" />
+                <img
+                  src={item.image}
+                  alt={item.title ? `${item.title} - ${clinicInfo.doctorName}` : 'Clinic gallery'}
+                  loading="lazy"
+                />
                 {hasMeta ? (
                   <figcaption className="home-gallery-meta">
                     {item.title ? <strong>{item.title}</strong> : null}

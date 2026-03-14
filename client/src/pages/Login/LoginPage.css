@@ -233,6 +233,75 @@
   color: var(--primary);
 }
 
+.auth-link {
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reset-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 20, 60, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.reset-card {
+  position: relative;
+  width: min(420px, 100%);
+  background: var(--surface);
+  padding: 28px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 12px;
+  text-align: center;
+}
+
+.reset-card h2 {
+  margin: 0;
+}
+
+.reset-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.reset-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(var(--primary-rgb), 0.08);
+  color: var(--text);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.reset-form {
+  display: grid;
+  gap: 10px;
+}
+
+.reset-form input {
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  padding: 0 10px;
+  height: 40px;
+  font: inherit;
+  background: var(--glass-surface);
+}
+
 .auth-footnote {
   margin: 0;
   font-size: 0.82rem;
