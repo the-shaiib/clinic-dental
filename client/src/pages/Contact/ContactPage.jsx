@@ -123,7 +123,7 @@ function ContactPage() {
           </label>
           <label className="field">
             Phone
-            <input type="tel" value={formData.phone} onChange={handleChange('phone')} placeholder="+212..." required />
+            <input type="tel" value={formData.phone} onChange={handleChange('phone')} placeholder="Your phone number" required />
           </label>
           <label className="field field-wide">
             Message
