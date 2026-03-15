@@ -1,4 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import Footer from '../Footer/Footer';
 import Header from '../Header/Header';
 import Seo from '../SEO/Seo';
@@ -11,9 +12,18 @@ function SiteLayout() {
     <div className="site-shell">
       <Seo />
       <Header key={location.pathname} />
-      <main className="page-main">
-        <Outlet />
-      </main>
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={location.pathname}
+          className="page-main"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+        >
+          <Outlet />
+        </motion.main>
+      </AnimatePresence>
       <Footer />
       <WhatsAppWidget />
     </div>

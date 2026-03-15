@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const axios = require('axios');
 const connectDB = require('./config/db');
 const seedAdmin = require('./config/seedAdmin');
 const authRoutes = require('./routes/authRoutes');
@@ -17,6 +18,10 @@ app.use(
 );
 app.use(express.json({ limit: '12mb' }));
 
+app.get('/ping', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
@@ -32,12 +37,36 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+const KEEP_ALIVE_INTERVAL_MS = 14 * 60 * 1000;
+
+const normalizeUrl = (url) => {
+  if (!url) return '';
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+};
+
+const startKeepAlive = () => {
+  const baseUrl = normalizeUrl(
+    process.env.RENDER_EXTERNAL_URL || process.env.BACKEND_URL || ''
+  );
+  if (!baseUrl || process.env.NODE_ENV !== 'production') {
+    return;
+  }
+
+  setInterval(async () => {
+    try {
+      await axios.get(`${baseUrl}/ping`);
+    } catch (error) {
+      console.warn('Keep-alive ping failed:', error?.message || error);
+    }
+  }, KEEP_ALIVE_INTERVAL_MS);
+};
 
 const startServer = async () => {
   await connectDB();
   await seedAdmin();
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    startKeepAlive();
   });
 };
 

@@ -4,37 +4,37 @@ const defaultGalleryItems = [
   {
     id: 'G-1',
     src: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=1200&q=80',
-    title: 'Dentist preparing tools at the clinic',
+    title: 'Dentiste preparant les instruments a la clinique',
     showOnSite: true,
   },
   {
     id: 'G-2',
     src: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1200&q=80',
-    title: 'Dental professional holding instruments',
+    title: 'Professionnel dentaire tenant les instruments',
     showOnSite: true,
   },
   {
     id: 'G-3',
     src: 'https://images.unsplash.com/photo-1588776814546-ec7e4f8f2587?auto=format&fit=crop&w=1200&q=80',
-    title: 'Close-up smile after dental care',
+    title: 'Sourire apres les soins dentaires',
     showOnSite: true,
   },
   {
     id: 'G-4',
     src: 'https://images.unsplash.com/photo-1588776813677-77aaf5595b83?auto=format&fit=crop&w=1200&q=80',
-    title: 'Patient receiving dental treatment',
+    title: 'Patient recevant un traitement dentaire',
     showOnSite: true,
   },
   {
     id: 'G-5',
     src: 'https://images.unsplash.com/photo-1606811856475-23254db5e0f3?auto=format&fit=crop&w=1200&q=80',
-    title: 'Dental team working together',
+    title: 'Equipe dentaire au travail',
     showOnSite: true,
   },
   {
     id: 'G-6',
     src: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1200&q=80',
-    title: 'Dental tools arranged on a tray',
+    title: 'Instruments dentaires disposes sur un plateau',
     showOnSite: true,
   },
 ];

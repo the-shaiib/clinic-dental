@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Header from '../../components/Header/Header';
 import './ResetPasswordPage.css';
@@ -13,14 +14,14 @@ function ResetPasswordPage() {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!resetCode || !newPassword || !confirmPassword) {
-      setError('Please fill in all fields.');
+      setError('Veuillez remplir tous les champs.');
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError('Les mots de passe ne correspondent pas.');
       return;
     }
-    setMessage('Your password has been reset successfully.');
+    setMessage('Votre mot de passe a ete reinitialise avec succes.');
     setError('');
   };
 
@@ -29,14 +30,19 @@ function ResetPasswordPage() {
       <Header />
       <div className="reset-password-shell">
         <main className="reset-password-main">
-          <div className="reset-password-form-area fade-up">
+          <motion.div
+            className="reset-password-form-area fade-up"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          >
             <div className="reset-password-head">
-              <h1>Reset your password</h1>
-              <p>Enter the verification code and set a new password.</p>
+              <h1>Reinitialiser votre mot de passe</h1>
+              <p>Saisissez le code de verification et choisissez un nouveau mot de passe.</p>
             </div>
             <form onSubmit={handleSubmit} className="auth-form">
               <label className="auth-field">
-                <span>Reset code</span>
+                <span>Code de reinitialisation</span>
                 <input
                   type="text"
                   value={resetCode}
@@ -44,12 +50,12 @@ function ResetPasswordPage() {
                     setResetCode(event.target.value);
                     setError('');
                   }}
-                  placeholder="Enter the code"
+                  placeholder="Saisir le code"
                   required
                 />
               </label>
               <label className="auth-field">
-                <span>New password</span>
+                <span>Nouveau mot de passe</span>
                 <input
                   type="password"
                   value={newPassword}
@@ -57,13 +63,13 @@ function ResetPasswordPage() {
                     setNewPassword(event.target.value);
                     setError('');
                   }}
-                  placeholder="Create a new password"
+                  placeholder="Creer un nouveau mot de passe"
                   autoComplete="new-password"
                   required
                 />
               </label>
               <label className="auth-field">
-                <span>Confirm new password</span>
+                <span>Confirmer le nouveau mot de passe</span>
                 <input
                   type="password"
                   value={confirmPassword}
@@ -71,19 +77,19 @@ function ResetPasswordPage() {
                     setConfirmPassword(event.target.value);
                     setError('');
                   }}
-                  placeholder="Re-enter new password"
+                  placeholder="Resaisir le nouveau mot de passe"
                   autoComplete="new-password"
                   required
                 />
               </label>
               {error && <p className="auth-error">{error}</p>}
               {message && <p className="auth-message">{message}</p>}
-              <button type="submit" className="auth-submit">Reset password</button>
+              <button type="submit" className="auth-submit">Reinitialiser le mot de passe</button>
             </form>
             <p className="auth-footnote">
-              Remembered your password? <Link to="/login">Log in</Link>
+              Vous vous souvenez de votre mot de passe ? <Link to="/login">Se connecter</Link>
             </p>
-          </div>
+          </motion.div>
         </main>
       </div>
     </div>

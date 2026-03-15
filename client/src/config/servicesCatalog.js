@@ -3,7 +3,7 @@ export const SERVICES_KEY = 'clinic_services_catalog';
 const defaultServices = [
   {
     id: 'S-101',
-    title: 'Cleaning & Prevention',
+    title: 'Nettoyage et prevention',
     tag: 'Consultation + Controle',
     icon: 'fa-solid fa-shield-heart',
     description:
@@ -11,7 +11,7 @@ const defaultServices = [
   },
   {
     id: 'S-102',
-    title: 'Whitening',
+    title: 'Blanchiment',
     tag: 'Esthetique du sourire',
     icon: 'fa-solid fa-wand-magic-sparkles',
     description:
@@ -27,7 +27,7 @@ const defaultServices = [
   },
   {
     id: 'S-104',
-    title: 'Orthodontics',
+    title: 'Orthodontie',
     tag: 'Alignement du sourire',
     icon: 'fa-solid fa-teeth',
     description:
@@ -35,7 +35,7 @@ const defaultServices = [
   },
   {
     id: 'S-105',
-    title: 'Root Canal',
+    title: 'Traitement de canal',
     tag: 'Traitement en profondeur',
     icon: 'fa-solid fa-syringe',
     description:
@@ -43,7 +43,7 @@ const defaultServices = [
   },
   {
     id: 'S-106',
-    title: 'Pediatric Care',
+    title: 'Soins pediatriques',
     tag: 'Soins enfants',
     icon: 'fa-solid fa-toothbrush',
     description:

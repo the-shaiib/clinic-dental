@@ -216,6 +216,10 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+.home-page .services-lite-card.skeleton-card {
+  min-height: 230px;
+}
+
 .home-page .services-lite-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 30px rgba(31, 78, 255, 0.18);

@@ -34,12 +34,12 @@ function ContactPage() {
     try {
       savedRequest = await createContactRequest({ name, phone, message });
     } catch {
-      setErrorMessage('We could not send your request. Please try again.');
+      setErrorMessage('Nous ne pouvons pas envoyer votre demande. Veuillez reessayer.');
       return;
     }
 
     const reference = `RDV-${Date.now().toString().slice(-6)}`;
-    const date = new Date(savedRequest.createdAt || Date.now()).toLocaleDateString('en-US', {
+    const date = new Date(savedRequest.createdAt || Date.now()).toLocaleDateString('fr-FR', {
       month: 'short',
       day: '2-digit',
       year: 'numeric',
@@ -64,17 +64,17 @@ function ContactPage() {
   return (
     <section className="contact-page page-section" id="contact">
       <div className="page-header fade-up">
-        <p className="section-tag">Appointment & Contact</p>
-        <h1>Book quickly without waiting on the phone</h1>
+        <p className="section-tag">Rendez-vous & Contact</p>
+        <h1>Prenez rendez-vous rapidement sans attendre au telephone</h1>
         <p className="lead">
-          Leave your name, phone number, and a short message. We will contact you to confirm your appointment.
+          Laissez votre nom, votre numero de telephone, et un court message. Nous vous contacterons pour confirmer votre rendez-vous.
         </p>
       </div>
 
       <div className="contact-grid fade-up fade-delay-1">
         <article className="info-card">
           <i className="fa-solid fa-phone-volume"></i>
-          <h3>Phone Lines</h3>
+          <h3>Lignes telephoniques</h3>
           <p>
             <a href={clinicInfo.phonePrimaryHref}>{clinicInfo.phonePrimary}</a>
           </p>
@@ -84,12 +84,12 @@ function ContactPage() {
         </article>
         <article className="info-card">
           <i className="fa-solid fa-location-dot"></i>
-          <h3>Address</h3>
+          <h3>Adresse</h3>
           <p>{clinicInfo.address}</p>
         </article>
         <article className="info-card">
           <i className="fa-solid fa-clock"></i>
-          <h3>Hours</h3>
+          <h3>Horaires</h3>
           <p>{clinicInfo.hours}</p>
         </article>
       </div>
@@ -97,33 +97,33 @@ function ContactPage() {
       <section className="appointment-panel fade-up fade-delay-2">
         <div className="appointment-intro">
           <div>
-            <p className="section-tag">Online Booking</p>
-            <h3>Simple appointment request</h3>
+            <p className="section-tag">Reservation en ligne</p>
+            <h3>Demande de rendez-vous simple</h3>
             <p>
-              A short form that lets us reach you quickly and confirm the right time.
+              Un court formulaire qui nous permet de vous joindre rapidement et de confirmer le bon horaire.
             </p>
           </div>
 
           <div className="booking-highlights">
             <span>
               <i className="fa-regular fa-pen-to-square"></i>
-              Write your need
+              Ecrivez votre besoin
             </span>
             <span>
               <i className="fa-regular fa-circle-check"></i>
-              We confirm fast
+              Confirmation rapide
             </span>
           </div>
         </div>
 
         <form className="contact-form" id="contact-form" onSubmit={handleSubmit}>
           <label className="field">
-            Full Name
-            <input type="text" value={formData.name} onChange={handleChange('name')} placeholder="Your full name" required />
+            Nom complet
+            <input type="text" value={formData.name} onChange={handleChange('name')} placeholder="Votre nom complet" required />
           </label>
           <label className="field">
-            Phone
-            <input type="tel" value={formData.phone} onChange={handleChange('phone')} placeholder="Your phone number" required />
+            Telephone
+            <input type="tel" value={formData.phone} onChange={handleChange('phone')} placeholder="Votre numero de telephone" required />
           </label>
           <label className="field field-wide">
             Message
@@ -131,13 +131,13 @@ function ContactPage() {
               rows="5"
               value={formData.message}
               onChange={handleChange('message')}
-              placeholder="Tell us what you need or the problem you want to solve"
+              placeholder="Dites-nous votre besoin ou le probleme a traiter"
               required
             ></textarea>
           </label>
           <button type="submit" className="btn btn-primary">
             <i className="fa-solid fa-calendar-check"></i>
-            Confirm Appointment
+            Confirmer le rendez-vous
           </button>
           {errorMessage ? <p className="contact-error">{errorMessage}</p> : null}
         </form>
@@ -146,20 +146,20 @@ function ContactPage() {
           <aside className="appointment-confirmation fade-up" aria-live="polite">
             <div className="confirmation-head">
               <p className="section-tag">Confirmation</p>
-              <h3>Appointment request recorded</h3>
+              <h3>Demande de rendez-vous enregistree</h3>
             </div>
 
             <div className="confirmation-grid">
               <article>
                 <i className="fa-regular fa-circle-check"></i>
-                <strong>Confirmation message</strong>
-                <p>Your request has been captured in the frontend booking flow.</p>
+                <strong>Message de confirmation</strong>
+                <p>Votre demande a ete enregistree dans le parcours de reservation.</p>
               </article>
               <article>
                 <i className="fa-solid fa-file-lines"></i>
-                <strong>Message received</strong>
+                <strong>Message recu</strong>
                 <p>
-                  {confirmation.message || 'We will follow up to confirm details.'}
+                  {confirmation.message || 'Nous vous contacterons pour confirmer les details.'}
                 </p>
               </article>
             </div>
@@ -184,7 +184,7 @@ function ContactPage() {
 
       <section className="contact-map fade-up fade-delay-2">
         <div className="map-head">
-          <h3>Clinic Location</h3>
+          <h3>Localisation de la clinique</h3>
           <a
             href={`https://maps.google.com/?q=${encodeURIComponent(clinicInfo.mapQuery)}`}
             target="_blank"
@@ -192,7 +192,7 @@ function ContactPage() {
             className="btn btn-link"
           >
             <i className="fa-solid fa-map-location-dot"></i>
-            Open in Maps
+            Ouvrir dans Maps
           </a>
         </div>
 

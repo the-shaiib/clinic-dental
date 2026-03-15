@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
@@ -23,8 +24,8 @@ const useConfirmDialog = () => {
     isOpen: false,
     title: '',
     message: '',
-    confirmLabel: 'Yes, delete',
-    cancelLabel: 'Cancel',
+    confirmLabel: 'Oui, supprimer',
+    cancelLabel: 'Annuler',
     onConfirm: null,
   });
 
@@ -33,8 +34,8 @@ const useConfirmDialog = () => {
       isOpen: true,
       title,
       message,
-      confirmLabel: confirmLabel || 'Yes, delete',
-      cancelLabel: cancelLabel || 'Cancel',
+      confirmLabel: confirmLabel || 'Oui, supprimer',
+      cancelLabel: cancelLabel || 'Annuler',
       onConfirm,
     });
   };
@@ -86,14 +87,14 @@ const allowedSections = new Set([
 ]);
 
 const serviceIconOptions = [
-  { value: 'fa-solid fa-tooth', label: 'Tooth' },
-  { value: 'fa-solid fa-shield-heart', label: 'Care shield' },
-  { value: 'fa-solid fa-wand-magic-sparkles', label: 'Whitening' },
-  { value: 'fa-solid fa-teeth', label: 'Orthodontics' },
-  { value: 'fa-solid fa-teeth-open', label: 'Smile care' },
+  { value: 'fa-solid fa-tooth', label: 'Dent' },
+  { value: 'fa-solid fa-shield-heart', label: 'Bouclier soin' },
+  { value: 'fa-solid fa-wand-magic-sparkles', label: 'Blanchiment' },
+  { value: 'fa-solid fa-teeth', label: 'Orthodontie' },
+  { value: 'fa-solid fa-teeth-open', label: 'Soin du sourire' },
   { value: 'fa-solid fa-toothbrush', label: 'Hygiene' },
   { value: 'fa-solid fa-stethoscope', label: 'Consultation' },
-  { value: 'fa-solid fa-syringe', label: 'Treatment' },
+  { value: 'fa-solid fa-syringe', label: 'Traitement' },
 ];
 
 function DashboardPage() {
@@ -164,10 +165,10 @@ function DashboardPage() {
 
   const handleLogout = () => {
     openConfirm({
-      title: 'Confirm logout',
-      message: 'Are you sure you want to log out from the admin dashboard?',
-      confirmLabel: 'Yes, log out',
-      cancelLabel: 'Cancel',
+      title: 'Confirmer la deconnexion',
+      message: 'Voulez-vous vraiment vous deconnecter du tableau de bord admin ?',
+      confirmLabel: 'Oui, se deconnecter',
+      cancelLabel: 'Annuler',
       onConfirm: () => {
         clearAuthSession();
         navigate('/', { replace: true });
@@ -210,10 +211,10 @@ function DashboardPage() {
 
   const handleDeleteGalleryItem = async (id) => {
     openConfirm({
-      title: 'Delete gallery image',
-      message: 'This image will be removed from the website. Are you sure?',
-      confirmLabel: 'Yes, delete',
-      cancelLabel: 'Cancel',
+      title: 'Supprimer l image de la galerie',
+      message: 'Cette image sera retiree du site. Etes-vous sur ?',
+      confirmLabel: 'Oui, supprimer',
+      cancelLabel: 'Annuler',
       onConfirm: async () => {
         try {
           await deleteGalleryItemApi(id);
@@ -266,10 +267,10 @@ function DashboardPage() {
 
   const handleDeleteBeforeAfter = async (id) => {
     openConfirm({
-      title: 'Delete before & after case',
-      message: 'This case will be removed from the website. Are you sure?',
-      confirmLabel: 'Yes, delete',
-      cancelLabel: 'Cancel',
+      title: 'Supprimer un cas avant/apres',
+      message: 'Ce cas sera retire du site. Etes-vous sur ?',
+      confirmLabel: 'Oui, supprimer',
+      cancelLabel: 'Annuler',
       onConfirm: async () => {
         try {
           await deleteBeforeAfterApi(id);
@@ -309,10 +310,10 @@ function DashboardPage() {
 
   const handleDeleteService = async (id) => {
     openConfirm({
-      title: 'Delete service',
-      message: 'This service will be removed from the website. Are you sure?',
-      confirmLabel: 'Yes, delete',
-      cancelLabel: 'Cancel',
+      title: 'Supprimer le service',
+      message: 'Ce service sera retire du site. Etes-vous sur ?',
+      confirmLabel: 'Oui, supprimer',
+      cancelLabel: 'Annuler',
       onConfirm: async () => {
         try {
           await deleteServiceApi(id);
@@ -330,21 +331,21 @@ function DashboardPage() {
     const newPassword = passwordForm.newPassword.trim();
     const confirmPassword = passwordForm.confirmPassword.trim();
     if (!currentPassword || !newPassword || !confirmPassword) {
-      setPasswordStatus({ message: '', error: 'Fill every password field.' });
+      setPasswordStatus({ message: '', error: 'Remplissez tous les champs de mot de passe.' });
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordStatus({ message: '', error: 'New passwords do not match.' });
+      setPasswordStatus({ message: '', error: 'Les nouveaux mots de passe ne correspondent pas.' });
       return;
     }
     try {
       await changePassword({ currentPassword, newPassword });
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      setPasswordStatus({ message: 'Password updated successfully.', error: '' });
+      setPasswordStatus({ message: 'Mot de passe mis a jour avec succes.', error: '' });
     } catch (err) {
       setPasswordStatus({
         message: '',
-        error: err.response?.data?.message || 'Unable to change password.',
+        error: err.response?.data?.message || 'Impossible de changer le mot de passe.',
       });
     }
   };
@@ -353,11 +354,16 @@ function DashboardPage() {
     <div className="site-shell dashboard-route">
       <Header />
       <main className="dashboard-page">
-        <div className="dashboard-shell">
+        <motion.div
+          className="dashboard-shell"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
           <aside className="dashboard-sidebar">
             <div className="sidebar-head">
-              <span className="sidebar-title">Admin Panel</span>
-              <p className="sidebar-subtitle">Simple control center</p>
+              <span className="sidebar-title">Panneau admin</span>
+              <p className="sidebar-subtitle">Centre de controle simple</p>
             </div>
 
             <nav className="sidebar-nav">
@@ -366,21 +372,21 @@ function DashboardPage() {
                 className={activeSection === 'gallery-upload' ? 'active' : ''}
                 onClick={() => handleSectionChange('gallery-upload')}
               >
-                Add gallery image
+                Ajouter une image a la galerie
               </button>
               <button
                 type="button"
                 className={activeSection === 'before-after' ? 'active' : ''}
                 onClick={() => handleSectionChange('before-after')}
               >
-                Before / After
+                Avant / Apres
               </button>
               <button
                 type="button"
                 className={activeSection === 'contact-requests' ? 'active' : ''}
                 onClick={() => handleSectionChange('contact-requests')}
               >
-                Contact requests
+                Demandes de contact
               </button>
               <button
                 type="button"
@@ -394,53 +400,53 @@ function DashboardPage() {
                 className={activeSection === 'change-password' ? 'active' : ''}
                 onClick={() => handleSectionChange('change-password')}
               >
-                Change password
+                Changer le mot de passe
               </button>
             </nav>
 
             <div className="sidebar-footer">
               <button type="button" className="logout-btn" onClick={handleLogout}>
-                Logout
+                Deconnexion
               </button>
             </div>
           </aside>
 
           <section className="dashboard-content">
             <header className="content-head">
-              <p className="section-tag">Dashboard</p>
-              <h1>Clinic admin workspace</h1>
-              <p className="content-subtitle">Manage gallery, requests, and services in one place.</p>
+              <p className="section-tag">Tableau de bord</p>
+              <h1>Espace admin de la clinique</h1>
+              <p className="content-subtitle">Gerez galerie, demandes et services en un seul endroit.</p>
             </header>
 
             {activeSection === 'gallery-upload' && (
               <section className="dashboard-panel">
                 <div className="panel-head">
                   <div>
-                    <h2>Clinic gallery</h2>
-                    <p>Upload clinic imagery that appears on the homepage gallery.</p>
+                    <h2>Galerie de la clinique</h2>
+                    <p>Televersez des images qui apparaissent sur la galerie de la page d accueil.</p>
                   </div>
                 </div>
                 <form className="panel-form panel-form-wide" onSubmit={handleAddGallery}>
                   <label>
-                    Image title (optional)
+                    Titre de l image (optionnel)
                     <input
                       type="text"
                       value={galleryForm.title}
                       onChange={(event) =>
                         setGalleryForm((current) => ({ ...current, title: event.target.value }))
                       }
-                      placeholder="Reception area"
+                      placeholder="Espace accueil"
                     />
                   </label>
                   <label>
-                    Internal description (optional)
+                    Description interne (optionnel)
                     <textarea
                       rows="4"
                       value={galleryForm.description}
                       onChange={(event) =>
                         setGalleryForm((current) => ({ ...current, description: event.target.value }))
                       }
-                      placeholder="Short internal note for this image."
+                      placeholder="Note interne pour cette image."
                     ></textarea>
                   </label>
                   <div className="upload-grid field-wide">
@@ -461,35 +467,35 @@ function DashboardPage() {
                       <span className="upload-icon">
                         <i className="fa-solid fa-cloud-arrow-up"></i>
                       </span>
-                      <span className="upload-title">Upload gallery image</span>
+                      <span className="upload-title">Televerser une image de galerie</span>
                       <span className="upload-subtitle">
-                        {galleryForm.file ? galleryForm.file.name : 'Click to choose file'}
+                        {galleryForm.file ? galleryForm.file.name : 'Cliquez pour choisir un fichier'}
                       </span>
                     </label>
                   </div>
                   <div className="panel-actions field-wide">
                     <button type="submit" className="btn btn-primary">
-                      Upload image
+                      Televerser l image
                     </button>
                   </div>
                 </form>
                 <div className="panel-list gallery-list">
                   {galleryItems.length === 0 ? (
-                    <p className="panel-helper">No gallery images yet.</p>
+                    <p className="panel-helper">Aucune image pour le moment.</p>
                   ) : (
                     galleryItems.map((item) => (
                       <article key={item._id} className="panel-card gallery-card">
                         <div className="gallery-thumb">
-                          <img src={item.image} alt={item.title || 'Gallery item'} loading="lazy" />
+                          <img src={item.image} alt={item.title || 'Element de galerie'} loading="lazy" />
                         </div>
                         <div className="gallery-info">
-                          <strong>{item.title || 'Untitled image'}</strong>
-                          {item.description ? <p>{item.description}</p> : <p className="muted">No description.</p>}
+                          <strong>{item.title || 'Image sans titre'}</strong>
+                          {item.description ? <p>{item.description}</p> : <p className="muted">Aucune description.</p>}
                         </div>
                         <div className="card-actions">
                           <div className="mini-actions">
                             <button type="button" className="danger" onClick={() => handleDeleteGalleryItem(item._id)}>
-                              Delete
+                              Supprimer
                             </button>
                           </div>
                         </div>
@@ -504,31 +510,31 @@ function DashboardPage() {
               <section className="dashboard-panel">
                 <div className="panel-head">
                   <div>
-                    <h2>Before &amp; After cases</h2>
-                    <p>Upload both images to showcase real transformations.</p>
+                    <h2>Cas avant / apres</h2>
+                    <p>Televersez les deux images pour montrer des transformations reelles.</p>
                   </div>
                 </div>
                 <form className="panel-form panel-form-wide" onSubmit={handleAddBeforeAfter}>
                   <label>
-                    Case title (optional)
+                    Titre du cas (optionnel)
                     <input
                       type="text"
                       value={beforeAfterForm.title}
                       onChange={(event) =>
                         setBeforeAfterForm((current) => ({ ...current, title: event.target.value }))
                       }
-                      placeholder="Whitening case"
+                      placeholder="Cas de blanchiment"
                     />
                   </label>
                   <label>
-                    Case note (optional)
+                    Note du cas (optionnel)
                     <textarea
                       rows="4"
                       value={beforeAfterForm.note}
                       onChange={(event) =>
                         setBeforeAfterForm((current) => ({ ...current, note: event.target.value }))
                       }
-                      placeholder="Short summary of the result."
+                      placeholder="Court resume du resultat."
                     ></textarea>
                   </label>
                   <div className="upload-grid field-wide">
@@ -549,9 +555,9 @@ function DashboardPage() {
                       <span className="upload-icon">
                         <i className="fa-solid fa-cloud-arrow-up"></i>
                       </span>
-                      <span className="upload-title">Upload before image</span>
+                      <span className="upload-title">Televerser image avant</span>
                       <span className="upload-subtitle">
-                        {beforeAfterForm.beforeFile ? beforeAfterForm.beforeFile.name : 'Click to choose file'}
+                        {beforeAfterForm.beforeFile ? beforeAfterForm.beforeFile.name : 'Cliquez pour choisir un fichier'}
                       </span>
                     </label>
                     <label className="upload-card">
@@ -571,39 +577,39 @@ function DashboardPage() {
                       <span className="upload-icon">
                         <i className="fa-solid fa-cloud-arrow-up"></i>
                       </span>
-                      <span className="upload-title">Upload after image</span>
+                      <span className="upload-title">Televerser image apres</span>
                       <span className="upload-subtitle">
-                        {beforeAfterForm.afterFile ? beforeAfterForm.afterFile.name : 'Click to choose file'}
+                        {beforeAfterForm.afterFile ? beforeAfterForm.afterFile.name : 'Cliquez pour choisir un fichier'}
                       </span>
                     </label>
                   </div>
                   <div className="panel-actions field-wide">
                     <button type="submit" className="btn btn-primary">
-                      Upload case
+                      Televerser le cas
                     </button>
                   </div>
                 </form>
                 <div className="panel-list">
                   {beforeAfterItems.length === 0 ? (
-                    <p className="panel-helper">No cases yet.</p>
+                    <p className="panel-helper">Aucun cas pour le moment.</p>
                   ) : (
                     beforeAfterItems.map((item) => (
                       <article key={item._id} className="panel-card before-after-card">
                         <div className="before-after-preview">
                           <img
                             src={item.beforeImage}
-                            alt={item.title ? `Before ${item.title}` : 'Before case'}
+                            alt={item.title ? `Avant ${item.title}` : 'Cas avant'}
                             loading="lazy"
                           />
                           <img
                             src={item.afterImage}
-                            alt={item.title ? `After ${item.title}` : 'After case'}
+                            alt={item.title ? `Apres ${item.title}` : 'Cas apres'}
                             loading="lazy"
                           />
                         </div>
                         <div className="before-after-info">
-                          <strong>{item.title || 'Untitled case'}</strong>
-                          {item.note ? <p>{item.note}</p> : <p className="muted">No note added.</p>}
+                          <strong>{item.title || 'Cas sans titre'}</strong>
+                          {item.note ? <p>{item.note}</p> : <p className="muted">Aucune note ajoutee.</p>}
                         </div>
                         <div className="card-actions">
                           <div className="mini-actions">
@@ -612,7 +618,7 @@ function DashboardPage() {
                               className="danger"
                               onClick={() => handleDeleteBeforeAfter(item._id)}
                             >
-                              Delete
+                              Supprimer
                             </button>
                           </div>
                         </div>
@@ -627,13 +633,13 @@ function DashboardPage() {
               <section className="dashboard-panel">
                 <div className="panel-head">
                   <div>
-                    <h2>Contact requests</h2>
-                    <p>Latest messages from the appointment form.</p>
+                    <h2>Demandes de contact</h2>
+                    <p>Derniers messages du formulaire de rendez-vous.</p>
                   </div>
                 </div>
                 <div className="panel-list">
                   {contactRequests.length === 0 ? (
-                    <p className="panel-helper">No contact requests yet.</p>
+                    <p className="panel-helper">Aucune demande pour le moment.</p>
                   ) : (
                     contactRequests.map((request) => (
                       <article key={request._id} className="panel-card request-card">
@@ -660,7 +666,7 @@ function DashboardPage() {
                         <p className="request-message">{request.message}</p>
                         <small className="request-date">
                           {request.createdAt
-                            ? new Date(request.createdAt).toLocaleDateString('en-US', {
+                            ? new Date(request.createdAt).toLocaleDateString('fr-FR', {
                                 month: 'short',
                                 day: '2-digit',
                                 year: 'numeric',
@@ -679,36 +685,36 @@ function DashboardPage() {
                 <div className="panel-head">
                   <div>
                     <h2>Services</h2>
-                    <p>Control how services appear on the homepage. The button always links to contact.</p>
+                    <p>Gerez l affichage des services sur la page d accueil. Le bouton renvoie toujours vers contact.</p>
                   </div>
                 </div>
                 <form className="panel-form panel-form-wide" onSubmit={handleAddService}>
                   <label>
-                    Service title
+                    Titre du service
                     <input
                       type="text"
                       value={serviceForm.title}
                       onChange={(event) =>
                         setServiceForm((current) => ({ ...current, title: event.target.value }))
                       }
-                      placeholder="Root canal therapy"
+                      placeholder="Traitement de canal"
                       required
                     />
                   </label>
                   <label>
-                    Service description
+                    Description du service
                     <textarea
                       rows="4"
                       value={serviceForm.description}
                       onChange={(event) =>
                         setServiceForm((current) => ({ ...current, description: event.target.value }))
                       }
-                      placeholder="Short, clear description of the service."
+                      placeholder="Description courte et claire du service."
                       required
                     ></textarea>
                   </label>
                   <label>
-                    Service category (optional)
+                    Categorie du service (optionnel)
                     <input
                       type="text"
                       value={serviceForm.tag}
@@ -719,7 +725,7 @@ function DashboardPage() {
                     />
                   </label>
                   <label>
-                    Icon style
+                    Style d icone
                     <div className="icon-picker">
                       {serviceIconOptions.map((option) => (
                         <button
@@ -739,13 +745,13 @@ function DashboardPage() {
                   </label>
                   <div className="panel-actions field-wide">
                     <button type="submit" className="btn btn-primary">
-                      Add service
+                      Ajouter le service
                     </button>
                   </div>
                 </form>
                 <div className="panel-list service-list">
                   {services.length === 0 ? (
-                    <p className="panel-helper">No services yet.</p>
+                    <p className="panel-helper">Aucun service pour le moment.</p>
                   ) : (
                     services.map((service) => (
                       <article key={service._id} className="panel-card service-card">
@@ -764,7 +770,7 @@ function DashboardPage() {
                               className="danger"
                               onClick={() => handleDeleteService(service._id)}
                             >
-                              Delete
+                              Supprimer
                             </button>
                           </div>
                         </div>
@@ -779,44 +785,44 @@ function DashboardPage() {
               <section className="dashboard-panel">
                 <div className="panel-head">
                   <div>
-                    <h2>Change password</h2>
-                    <p>Keep your admin password in sync with the database.</p>
+                    <h2>Changer le mot de passe</h2>
+                    <p>Gardez le mot de passe admin synchronise avec la base.</p>
                   </div>
                 </div>
                 <form className="panel-form" onSubmit={handleChangePasswordSubmit}>
                   <label>
-                    Current password
+                    Mot de passe actuel
                     <input
                       type="password"
                       value={passwordForm.currentPassword}
                       onChange={(event) =>
                         setPasswordForm((current) => ({ ...current, currentPassword: event.target.value }))
                       }
-                      placeholder="Enter current password"
+                      placeholder="Saisir le mot de passe actuel"
                       required
                     />
                   </label>
                   <label>
-                    New password
+                    Nouveau mot de passe
                     <input
                       type="password"
                       value={passwordForm.newPassword}
                       onChange={(event) =>
                         setPasswordForm((current) => ({ ...current, newPassword: event.target.value }))
                       }
-                      placeholder="Enter new password"
+                      placeholder="Saisir le nouveau mot de passe"
                       required
                     />
                   </label>
                   <label>
-                    Confirm new password
+                    Confirmer le nouveau mot de passe
                     <input
                       type="password"
                       value={passwordForm.confirmPassword}
                       onChange={(event) =>
                         setPasswordForm((current) => ({ ...current, confirmPassword: event.target.value }))
                       }
-                      placeholder="Confirm new password"
+                      placeholder="Confirmer le nouveau mot de passe"
                       required
                     />
                   </label>
@@ -824,14 +830,14 @@ function DashboardPage() {
                   {passwordStatus.message && <p className="panel-message">{passwordStatus.message}</p>}
                   <div className="panel-actions">
                     <button type="submit" className="btn btn-primary">
-                      Update password
+                      Mettre a jour le mot de passe
                     </button>
                   </div>
                 </form>
               </section>
             )}
           </section>
-        </div>
+        </motion.div>
       </main>
       {confirmState.isOpen && typeof document !== 'undefined'
         ? createPortal(

@@ -6,8 +6,8 @@ import './Header.css';
 const THEME_STORAGE_KEY = 'clinic_theme';
 
 const navItems = [
-  { to: '/', label: 'Home', end: true },
-  { to: '/clinic', label: 'Clinic' },
+  { to: '/', label: 'Accueil', end: true },
+  { to: '/clinic', label: 'Clinique' },
   { to: '/contact', label: 'Contact' },
 ];
 
@@ -110,7 +110,7 @@ function Header() {
             type="button"
             className={`nav-backdrop ${isMenuOpen ? 'open' : ''}`}
             onClick={handleCloseMenu}
-            aria-label="Close navigation menu"
+            aria-label="Fermer le menu de navigation"
           ></button>
 
           <div className="header-actions">
@@ -118,13 +118,13 @@ function Header() {
               type="button"
               className="theme-toggle"
               onClick={() => setIsDarkMode((currentState) => !currentState)}
-              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={isDarkMode ? 'Passer au mode clair' : 'Passer au mode sombre'}
             >
               <i className={isDarkMode ? 'fa-regular fa-sun' : 'fa-regular fa-moon'}></i>
             </button>
 
             {authUser ? (
-              <Link className="profile-btn" to="/dashboard" onClick={handleCloseMenu} aria-label="Profile">
+              <Link className="profile-btn" to="/dashboard" onClick={handleCloseMenu} aria-label="Profil">
                 {authUser.avatar ? (
                   <img src={authUser.avatar} alt={authUser.name} />
                 ) : (
@@ -132,7 +132,7 @@ function Header() {
                 )}
               </Link>
             ) : (
-              <Link className="login-btn" to="/login" onClick={handleCloseMenu} aria-label="Admin login">
+              <Link className="login-btn" to="/login" onClick={handleCloseMenu} aria-label="Connexion admin">
                 <i className="fa-solid fa-right-to-bracket"></i>
               </Link>
             )}
@@ -141,7 +141,7 @@ function Header() {
               type="button"
               className="menu-toggle"
               onClick={() => setIsMenuOpen((currentState) => !currentState)}
-              aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-label={isMenuOpen ? 'Fermer le menu de navigation' : 'Ouvrir le menu de navigation'}
               aria-expanded={isMenuOpen}
             >
               <i className={isMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'}></i>

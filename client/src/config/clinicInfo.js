@@ -1,6 +1,6 @@
 export const clinicInfo = {
   doctorName: 'Dr Bijarch Latifa',
-  brandName: 'Dr Bijarch Dental Clinic',
+  brandName: 'Cabinet dentaire Dr Bijarch',
   heroTitle: 'Pour un sourire eclatant',
   tagline: 'Conseils et soins dentaires simples et pratiques.',
   address: 'Marrakech | Gueliz',
@@ -12,5 +12,5 @@ export const clinicInfo = {
   emailHref: 'mailto:contact@drbijarch.ma',
   mapQuery: 'Cabinet dentaire Dr Bijarch Latifa Marrakech Gueliz',
   mapTitle: 'Dr Bijarch Latifa - Marrakech Gueliz',
-  hours: 'Monday - Saturday | 09:00 - 20:00',
+  hours: 'Lundi - Samedi | 09:00 - 20:00',
 };

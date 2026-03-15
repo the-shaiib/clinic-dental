@@ -32,7 +32,7 @@ function WhatsAppWidget() {
       href={url}
       target="_blank"
       rel="noreferrer"
-      aria-label="WhatsApp appointment"
+      aria-label="Rendez-vous WhatsApp"
       title="WhatsApp"
       style={{ position: 'fixed', right: 24, bottom: 24, zIndex: 9999 }}
     >
