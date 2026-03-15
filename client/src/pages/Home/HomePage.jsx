@@ -146,7 +146,7 @@ function HomePage() {
           {galleryLoading
             ? Array.from({ length: 6 }).map((_, index) => (
                 <motion.div className="home-gallery-item skeleton-card" variants={staggerItem} key={`gallery-skeleton-${index}`}>
-                  <Skeleton height={260} />
+                  <Skeleton className="gallery-skeleton" />
                 </motion.div>
               ))
             : galleryItems.map((item, index) => {

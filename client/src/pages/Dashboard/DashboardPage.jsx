@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import Skeleton from 'react-loading-skeleton';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header/Header';
@@ -109,6 +110,7 @@ function DashboardPage() {
   const [services, setServices] = useState([]);
   const [contactRequests, setContactRequests] = useState([]);
   const [galleryItems, setGalleryItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [galleryForm, setGalleryForm] = useState({
     title: '',
     description: '',
@@ -152,11 +154,27 @@ function DashboardPage() {
         setContactRequests(contacts);
       } catch {
         // Silent fail: API may not be ready yet.
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadData();
   }, []);
+
+  const staggerGrid = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.08,
+      },
+    },
+  };
+
+  const staggerItem = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -480,7 +498,25 @@ function DashboardPage() {
                   </div>
                 </form>
                 <div className="panel-list gallery-list">
-                  {galleryItems.length === 0 ? (
+                  {isLoading ? (
+                    <motion.div variants={staggerGrid} initial="hidden" animate="visible">
+                      {Array.from({ length: 4 }).map((_, index) => (
+                        <motion.article
+                          key={`gallery-skeleton-${index}`}
+                          className="panel-card gallery-card skeleton-card"
+                          variants={staggerItem}
+                        >
+                          <div className="gallery-thumb">
+                            <Skeleton height={80} />
+                          </div>
+                          <div className="gallery-info">
+                            <Skeleton width="60%" />
+                            <Skeleton width="80%" />
+                          </div>
+                        </motion.article>
+                      ))}
+                    </motion.div>
+                  ) : galleryItems.length === 0 ? (
                     <p className="panel-helper">Aucune image pour le moment.</p>
                   ) : (
                     galleryItems.map((item) => (
@@ -590,7 +626,26 @@ function DashboardPage() {
                   </div>
                 </form>
                 <div className="panel-list">
-                  {beforeAfterItems.length === 0 ? (
+                  {isLoading ? (
+                    <motion.div variants={staggerGrid} initial="hidden" animate="visible">
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        <motion.article
+                          key={`before-after-skeleton-${index}`}
+                          className="panel-card before-after-card skeleton-card"
+                          variants={staggerItem}
+                        >
+                          <div className="before-after-preview">
+                            <Skeleton height={90} />
+                            <Skeleton height={90} />
+                          </div>
+                          <div className="before-after-info">
+                            <Skeleton width="55%" />
+                            <Skeleton width="75%" />
+                          </div>
+                        </motion.article>
+                      ))}
+                    </motion.div>
+                  ) : beforeAfterItems.length === 0 ? (
                     <p className="panel-helper">Aucun cas pour le moment.</p>
                   ) : (
                     beforeAfterItems.map((item) => (
@@ -638,7 +693,24 @@ function DashboardPage() {
                   </div>
                 </div>
                 <div className="panel-list">
-                  {contactRequests.length === 0 ? (
+                  {isLoading ? (
+                    <motion.div variants={staggerGrid} initial="hidden" animate="visible">
+                      {Array.from({ length: 4 }).map((_, index) => (
+                        <motion.article
+                          key={`contact-skeleton-${index}`}
+                          className="panel-card request-card skeleton-card"
+                          variants={staggerItem}
+                        >
+                          <div className="request-person">
+                            <Skeleton width={120} />
+                            <Skeleton width={90} />
+                          </div>
+                          <Skeleton count={2} />
+                          <Skeleton width={80} />
+                        </motion.article>
+                      ))}
+                    </motion.div>
+                  ) : contactRequests.length === 0 ? (
                     <p className="panel-helper">Aucune demande pour le moment.</p>
                   ) : (
                     contactRequests.map((request) => (
@@ -750,7 +822,25 @@ function DashboardPage() {
                   </div>
                 </form>
                 <div className="panel-list service-list">
-                  {services.length === 0 ? (
+                  {isLoading ? (
+                    <motion.div variants={staggerGrid} initial="hidden" animate="visible">
+                      {Array.from({ length: 4 }).map((_, index) => (
+                        <motion.article
+                          key={`service-skeleton-${index}`}
+                          className="panel-card service-card skeleton-card"
+                          variants={staggerItem}
+                        >
+                          <div className="service-icon">
+                            <Skeleton height={34} width={34} />
+                          </div>
+                          <div className="service-info">
+                            <Skeleton width="60%" />
+                            <Skeleton count={2} />
+                          </div>
+                        </motion.article>
+                      ))}
+                    </motion.div>
+                  ) : services.length === 0 ? (
                     <p className="panel-helper">Aucun service pour le moment.</p>
                   ) : (
                     services.map((service) => (
