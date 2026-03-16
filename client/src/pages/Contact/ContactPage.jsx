@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { clinicInfo } from '../../config/clinicInfo';
 import { createContactRequest } from '../../config/api';
 import './ContactPage.css';
@@ -13,6 +14,15 @@ function ContactPage() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (field) => (event) => {
+    if (field === 'phone') {
+      const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, 10);
+      setFormData((currentState) => ({
+        ...currentState,
+        phone: digitsOnly,
+      }));
+      return;
+    }
+
     setFormData((currentState) => ({
       ...currentState,
       [field]: event.target.value,
@@ -26,7 +36,7 @@ function ContactPage() {
     const phone = formData.phone.trim();
     const message = formData.message.trim();
 
-    if (!name || !phone || !message) {
+    if (!name || !phone || !message || phone.length !== 10) {
       return;
     }
 
@@ -123,7 +133,16 @@ function ContactPage() {
           </label>
           <label className="field">
             Telephone
-            <input type="tel" value={formData.phone} onChange={handleChange('phone')} placeholder="Votre numero de telephone" required />
+            <input
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]{10}"
+              maxLength={10}
+              value={formData.phone}
+              onChange={handleChange('phone')}
+              placeholder="Votre numero de telephone"
+              required
+            />
           </label>
           <label className="field field-wide">
             Message
@@ -139,47 +158,11 @@ function ContactPage() {
             <i className="fa-solid fa-calendar-check"></i>
             Confirmer le rendez-vous
           </button>
+          {confirmation ? (
+            <p className="contact-success">Envoye. Merci {confirmation.name}.</p>
+          ) : null}
           {errorMessage ? <p className="contact-error">{errorMessage}</p> : null}
         </form>
-
-        {confirmation ? (
-          <aside className="appointment-confirmation fade-up" aria-live="polite">
-            <div className="confirmation-head">
-              <p className="section-tag">Confirmation</p>
-              <h3>Demande de rendez-vous enregistree</h3>
-            </div>
-
-            <div className="confirmation-grid">
-              <article>
-                <i className="fa-regular fa-circle-check"></i>
-                <strong>Message de confirmation</strong>
-                <p>Votre demande a ete enregistree dans le parcours de reservation.</p>
-              </article>
-              <article>
-                <i className="fa-solid fa-file-lines"></i>
-                <strong>Message recu</strong>
-                <p>
-                  {confirmation.message || 'Nous vous contacterons pour confirmer les details.'}
-                </p>
-              </article>
-            </div>
-
-            <div className="confirmation-summary">
-              <span>
-                <i className="fa-solid fa-hashtag"></i>
-                {confirmation.reference}
-              </span>
-              <span>
-                <i className="fa-solid fa-user"></i>
-                {confirmation.name}
-              </span>
-              <span>
-                <i className="fa-solid fa-phone"></i>
-                {confirmation.phone}
-              </span>
-            </div>
-          </aside>
-        ) : null}
       </section>
 
       <section className="contact-map fade-up fade-delay-2">

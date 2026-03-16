@@ -10,6 +10,7 @@ import {
   createService as createServiceApi,
   deleteBeforeAfter as deleteBeforeAfterApi,
   deleteGalleryItem as deleteGalleryItemApi,
+  deleteContactRequest as deleteContactRequestApi,
   deleteService as deleteServiceApi,
   fetchBeforeAfter,
   fetchContactRequests,
@@ -111,6 +112,7 @@ function DashboardPage() {
   const [contactRequests, setContactRequests] = useState([]);
   const [galleryItems, setGalleryItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [confirmedRequestIds, setConfirmedRequestIds] = useState(() => new Set());
   const [galleryForm, setGalleryForm] = useState({
     title: '',
     description: '',
@@ -336,6 +338,39 @@ function DashboardPage() {
         try {
           await deleteServiceApi(id);
           setServices((current) => current.filter((service) => service._id !== id));
+        } catch {
+          return;
+        }
+      },
+    });
+  };
+
+  const handleConfirmRequest = (id) => {
+    openConfirm({
+      title: 'Confirmer la demande',
+      message: 'Voulez-vous confirmer cette demande de contact ?',
+      confirmLabel: 'Oui, confirmer',
+      cancelLabel: 'Annuler',
+      onConfirm: () => {
+        setConfirmedRequestIds((current) => {
+          const next = new Set(current);
+          next.add(id);
+          return next;
+        });
+      },
+    });
+  };
+
+  const handleDeleteContactRequest = async (id) => {
+    openConfirm({
+      title: 'Supprimer la demande',
+      message: 'Cette demande sera supprimee. Etes-vous sur ?',
+      confirmLabel: 'Oui, supprimer',
+      cancelLabel: 'Annuler',
+      onConfirm: async () => {
+        try {
+          await deleteContactRequestApi(id);
+          setContactRequests((current) => current.filter((request) => request._id !== id));
         } catch {
           return;
         }
@@ -745,6 +780,30 @@ function DashboardPage() {
                               })
                             : ''}
                         </small>
+                        <div className="request-actions mini-actions">
+                          <button
+                            type="button"
+                            onClick={() => handleConfirmRequest(request._id)}
+                            disabled={confirmedRequestIds.has(request._id)}
+                            className={confirmedRequestIds.has(request._id) ? 'success' : undefined}
+                          >
+                            {confirmedRequestIds.has(request._id) ? (
+                              <>
+                                <i className="fa-regular fa-circle-check" aria-hidden="true"></i>
+                                Confirmee
+                              </>
+                            ) : (
+                              'Confirmer'
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            className="danger"
+                            onClick={() => handleDeleteContactRequest(request._id)}
+                          >
+                            Supprimer
+                          </button>
+                        </div>
                       </article>
                     ))
                   )}

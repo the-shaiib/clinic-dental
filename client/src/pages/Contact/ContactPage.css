@@ -154,12 +154,21 @@
   font-weight: 600;
 }
 
+.contact-page .contact-success {
+  grid-column: 1 / -1;
+  margin: 6px 0 0;
+  color: #15803d;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 .contact-page .appointment-confirmation {
   margin-top: 16px;
-  padding: 16px;
+  padding: 18px;
   border-radius: 18px;
   border: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--glass-surface-strong);
+  box-shadow: var(--glass-shadow);
 }
 
 .contact-page .confirmation-head h3 {
@@ -167,45 +176,31 @@
   font-size: 1.1rem;
 }
 
-.contact-page .confirmation-grid {
-  margin-top: 14px;
+.contact-page .confirmation-card {
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
-.contact-page .confirmation-grid article {
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.78);
+.contact-page .confirmation-card .section-tag {
+  margin-bottom: 6px;
 }
 
-.contact-page .confirmation-grid i {
-  color: var(--primary);
-  font-size: 1rem;
+.contact-page .confirmation-card .lead {
+  margin: 8px auto 0;
 }
 
-.contact-page .confirmation-grid strong {
-  display: block;
-  margin-top: 10px;
-}
-
-.contact-page .confirmation-grid p {
-  margin: 6px 0 0;
-  color: var(--muted);
-  line-height: 1.5;
-  font-size: 0.88rem;
-}
-
-.contact-page .confirmation-summary {
-  margin-top: 14px;
+.contact-page .confirmation-details {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-.contact-page .confirmation-summary span {
+.contact-page .confirmation-details span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -214,7 +209,49 @@
   border: 1px solid var(--line);
   font-size: 0.84rem;
   font-weight: 700;
+  background: rgba(var(--primary-rgb), 0.06);
 }
+
+.contact-page .confirmation-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 12px 24px rgba(17, 50, 153, 0.08);
+  color: var(--muted);
+}
+
+.contact-page .confirmation-message i {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.contact-page .confirmation-message p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.contact-page .confirmation-actions {
+  display: flex;
+  justify-content: center;
+}
+
+:root[data-theme='dark'] .contact-page .appointment-confirmation {
+  background: var(--glass-surface-strong);
+  border-color: var(--glass-border);
+}
+
+:root[data-theme='dark'] .contact-page .confirmation-message {
+  background: rgba(16, 16, 16, 0.75);
+  border-color: var(--glass-border);
+  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.45);
+}
+
 
 .contact-page .contact-map {
   margin-top: 18px;
