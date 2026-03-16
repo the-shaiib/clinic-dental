@@ -10,17 +10,16 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = (process.env.CLIENT_ORIGINS || process.env.CLIENT_ORIGIN || '')
-  .split(',')
-  .map((origin) => origin.trim().replace(/\/$/, ''))
-  .filter(Boolean);
+const allowedOrigins = process.env.CLIENT_ORIGINS
+  ? process.env.CLIENT_ORIGINS.split(',').map((origin) => origin.trim().replace(/\/$/, ''))
+  : ['http://localhost:5173'];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.length === 0) return callback(null, true);
+    if (!origin) return callback(null, true);
     const normalizedOrigin = origin.replace(/\/$/, '');
     if (allowedOrigins.includes(normalizedOrigin)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'));
+    return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
