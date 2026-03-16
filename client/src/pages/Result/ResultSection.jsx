@@ -1,11 +1,10 @@
 import { motion } from 'framer-motion';
 import Skeleton from 'react-loading-skeleton';
-import { useBeforeAfter } from '../../hooks/useClinicData';
 import BlurImage from '../../components/Media/BlurImage';
 import './ResultSection.css';
 
-function ResultSection() {
-  const { data: beforeAfterCases = [], isLoading } = useBeforeAfter();
+function ResultSection({ items = [], isLoading = false }) {
+  const beforeAfterCases = items;
 
   const staggerGrid = {
     hidden: {},

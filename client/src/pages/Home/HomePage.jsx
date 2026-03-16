@@ -1,17 +1,58 @@
 import { motion } from 'framer-motion';
-import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { clinicInfo } from '../../config/clinicInfo';
-import { useGallery, useServices } from '../../hooks/useClinicData';
+import servicesData from './Services/servicesData';
 import BlurImage from '../../components/Media/BlurImage';
 import mainImage from '../../assets/mainimg.png';
+import gallery1 from '../../assets/clinic-img/g.png';
+import gallery2 from '../../assets/clinic-img/g2.png';
+import gallery3 from '../../assets/clinic-img/g3.png';
+import gallery4 from '../../assets/clinic-img/g4.png';
+import gallery5 from '../../assets/clinic-img/g5.png';
+import gallery6 from '../../assets/clinic-img/g6.png';
+import before1 from '../../assets/clinic-img/b1.png';
+import before2 from '../../assets/clinic-img/b2.png';
+import before3 from '../../assets/clinic-img/b3.png';
+import after1 from '../../assets/clinic-img/a1.png';
+import after2 from '../../assets/clinic-img/a2.png';
+import after3 from '../../assets/clinic-img/a3.png';
 import ResultSection from '../Result/ResultSection';
 import ReviewsSection from '../Reviews/ReviewsSection';
 import './HomePage.css';
 
 function HomePage() {
-  const { data: services = [], isLoading: servicesLoading } = useServices();
-  const { data: galleryItems = [], isLoading: galleryLoading } = useGallery();
+  const services = servicesData;
+  const galleryItems = [
+    { image: gallery1, title: 'Accueil du cabinet', description: 'Espace reception lumineux.' },
+    { image: gallery2, title: 'Salle de soins', description: 'Confort et hygiene.' },
+    { image: gallery3, title: 'Materiel moderne', description: 'Equipements de precision.' },
+    { image: gallery4, title: 'Espace patient', description: 'Ambiance calme.' },
+    { image: gallery5, title: 'Equipe dentaire', description: 'Soins professionnels.' },
+    { image: gallery6, title: 'Zone sterile', description: 'Protocoles rigoureux.' },
+  ];
+  const beforeAfterCases = [
+    {
+      _id: 'case-1',
+      title: 'Alignement',
+      note: 'Alignement et harmonie du sourire.',
+      beforeImage: before1,
+      afterImage: after1,
+    },
+    {
+      _id: 'case-2',
+      title: 'Blanchiment',
+      note: 'Teinte plus claire et sourire lumineux.',
+      beforeImage: before2,
+      afterImage: after2,
+    },
+    {
+      _id: 'case-3',
+      title: 'Restauration',
+      note: 'Forme et teinte harmonisees pour un sourire naturel.',
+      beforeImage: before3,
+      afterImage: after3,
+    },
+  ];
 
   const staggerGrid = {
     hidden: {},
@@ -92,44 +133,24 @@ function HomePage() {
           initial="hidden"
           animate="visible"
         >
-          {servicesLoading
-            ? Array.from({ length: 4 }).map((_, index) => (
-                <motion.article className="services-lite-card skeleton-card" variants={staggerItem} key={`service-skeleton-${index}`}>
-                  <div className="icon-shell">
-                    <Skeleton height={44} width={44} />
-                  </div>
-                  <h3>
-                    <Skeleton width="70%" />
-                  </h3>
-                  <p>
-                    <Skeleton count={2} />
-                  </p>
-                  <div className="services-lite-tag">
-                    <Skeleton width={90} />
-                  </div>
-                  <div className="services-lite-link">
-                    <Skeleton width={140} height={18} />
-                  </div>
-                </motion.article>
-              ))
-            : services.map((service) => (
-                <motion.article className="services-lite-card" variants={staggerItem} key={service.title}>
-                  <div className="icon-shell">
-                    <i className={service.icon || 'fa-solid fa-tooth'}></i>
-                  </div>
-                  <h3>{service.title}</h3>
-                  <p>{service.description}</p>
-                  {service.tag ? <span className="services-lite-tag">{service.tag}</span> : null}
-                  <Link className="services-lite-link" to="/contact#contact-form">
-                    <i className="fa-solid fa-arrow-right"></i>
-                    Prendre rendez-vous
-                  </Link>
-                </motion.article>
-              ))}
+          {services.map((service) => (
+            <motion.article className="services-lite-card" variants={staggerItem} key={service.title}>
+              <div className="icon-shell">
+                <i className={service.icon || 'fa-solid fa-tooth'}></i>
+              </div>
+              <h3>{service.title}</h3>
+              <p>{service.description}</p>
+              {service.tag ? <span className="services-lite-tag">{service.tag}</span> : null}
+              <Link className="services-lite-link" to="/contact#contact-form">
+                <i className="fa-solid fa-arrow-right"></i>
+                Prendre rendez-vous
+              </Link>
+            </motion.article>
+          ))}
         </motion.div>
       </section>
 
-      <ResultSection />
+      <ResultSection items={beforeAfterCases} />
 
       <section className="home-gallery">
         <div className="gallery-head fade-up">
@@ -143,29 +164,23 @@ function HomePage() {
           initial="hidden"
           animate="visible"
         >
-          {galleryLoading
-            ? Array.from({ length: 6 }).map((_, index) => (
-                <motion.div className="home-gallery-item skeleton-card" variants={staggerItem} key={`gallery-skeleton-${index}`}>
-                  <Skeleton className="gallery-skeleton" />
-                </motion.div>
-              ))
-            : galleryItems.map((item, index) => {
-                const hasMeta = Boolean(item.title?.trim() || item.description?.trim());
-                return (
-                  <motion.figure className="home-gallery-item" variants={staggerItem} key={item._id ?? `${item.image}-${index}`}>
-                    <BlurImage
-                      src={item.image}
-                      alt={item.title ? `${item.title} - ${clinicInfo.doctorName}` : 'Galerie de la clinique'}
-                    />
-                    {hasMeta ? (
-                      <figcaption className="home-gallery-meta">
-                        {item.title ? <strong>{item.title}</strong> : null}
-                        {item.description ? <span>{item.description}</span> : null}
-                      </figcaption>
-                    ) : null}
-                  </motion.figure>
-                );
-              })}
+          {galleryItems.map((item, index) => {
+            const hasMeta = Boolean(item.title?.trim() || item.description?.trim());
+            return (
+              <motion.figure className="home-gallery-item" variants={staggerItem} key={`${item.image}-${index}`}>
+                <BlurImage
+                  src={item.image}
+                  alt={item.title ? `${item.title} - ${clinicInfo.doctorName}` : 'Galerie de la clinique'}
+                />
+                {hasMeta ? (
+                  <figcaption className="home-gallery-meta">
+                    {item.title ? <strong>{item.title}</strong> : null}
+                    {item.description ? <span>{item.description}</span> : null}
+                  </figcaption>
+                ) : null}
+              </motion.figure>
+            );
+          })}
         </motion.div>
       </section>
 
