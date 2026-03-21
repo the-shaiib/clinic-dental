@@ -64,9 +64,6 @@ const toWhatsappNumber = (raw) => {
   const digits = String(raw ?? '').replace(/\D/g, '');
   if (!digits) return '';
   if (digits.startsWith('00')) return digits.slice(2);
-  if (digits.startsWith('0') && digits.length === 10) {
-    return `212${digits.slice(1)}`;
-  }
   return digits;
 };
 
@@ -301,6 +298,22 @@ function DashboardPage() {
                             </span>
                           )}
                         </div>
+                        {request.email ? <p className="request-message">{request.email}</p> : null}
+                        {request.issue ? (
+                          <p className="request-message">
+                            <strong>Issue:</strong> {request.issue}
+                          </p>
+                        ) : null}
+                        {request.preferredSlot ? (
+                          <p className="request-message">
+                            <strong>Preferred time:</strong> {request.preferredSlot}
+                          </p>
+                        ) : null}
+                        {request.urgency ? (
+                          <p className="request-message">
+                            <strong>Priority:</strong> {request.urgency}
+                          </p>
+                        ) : null}
                         <p className="request-message">{request.message}</p>
                         <small className="request-date">
                           {request.createdAt

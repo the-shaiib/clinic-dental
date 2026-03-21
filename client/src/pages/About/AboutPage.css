@@ -65,6 +65,18 @@
   color: var(--primary);
 }
 
+.about-page .about-copy {
+  margin-top: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.about-page .about-copy p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .about-page .about-stats {
   margin: 20px 0;
   display: grid;

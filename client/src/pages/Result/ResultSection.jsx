@@ -24,8 +24,8 @@ function ResultSection({ items = [], isLoading = false }) {
   return (
     <section className="result-section page-section" id="result">
       <div className="result-head fade-up">
-        <p className="section-tag">Avant / Apres</p>
-        <h2>Transformations professionnelles du sourire</h2>
+        <p className="section-tag">Treatment Focus</p>
+        <h2>Examples of smile goals we plan for every patient</h2>
       </div>
 
       <motion.div
@@ -56,17 +56,17 @@ function ResultSection({ items = [], isLoading = false }) {
                   <figure className="result-photo result-before">
                     <BlurImage
                       src={item.beforeImage}
-                      alt={item.title ? `Avant ${item.title}` : 'Avant traitement'}
+                      alt={item.title ? `${item.title} assessment` : 'Initial assessment'}
                     />
-                    <figcaption>Avant</figcaption>
+                    <figcaption>Assessment</figcaption>
                   </figure>
 
                   <figure className="result-photo result-after">
                     <BlurImage
                       src={item.afterImage}
-                      alt={item.title ? `Apres ${item.title}` : 'Apres traitement'}
+                      alt={item.title ? `${item.title} treatment goal` : 'Treatment goal'}
                     />
-                    <figcaption>Apres</figcaption>
+                    <figcaption>Treatment Goal</figcaption>
                   </figure>
                 </div>
 

@@ -3,32 +3,32 @@ import './ReviewsSection.css';
 
 const reviews = [
   {
-    name: 'Salma B.',
-    meta: 'Avis patient',
-    time: 'il y a 2 semaines',
+    name: 'Emily R.',
+    meta: 'Cosmetic dentistry patient',
+    time: '2 weeks ago',
     rating: 5,
-    text: 'La prise de rendez-vous etait simple, la clinique etait propre, et l equipe a explique chaque etape clairement.',
+    text: 'Booking was simple, the clinic felt polished and calm, and every step of my treatment plan was explained clearly.',
   },
   {
-    name: 'Yassine A.',
-    meta: 'Avis patient',
-    time: 'il y a 1 mois',
+    name: 'Carlos M.',
+    meta: 'Implant consultation',
+    time: '1 month ago',
     rating: 5,
-    text: 'J ai pu voir les resultats avant/apres avant de prendre rendez-vous, et cela m a donne confiance.',
+    text: 'Dr. Morgan made the implant process easy to understand and the team followed up quickly after my visit.',
   },
   {
-    name: 'Imane K.',
-    meta: 'Avis patient',
-    time: 'il y a 2 mois',
+    name: 'Sophia L.',
+    meta: 'Invisalign patient',
+    time: '2 months ago',
     rating: 5,
-    text: 'Des soins tres professionnels. Le rendez-vous etait a l heure et le plan de traitement etait explique simplement.',
+    text: 'Appointments were on time, the staff was welcoming, and I appreciated how organized the Invisalign plan felt.',
   },
   {
-    name: 'Nadia R.',
-    meta: 'Avis patient',
-    time: 'il y a 3 mois',
+    name: 'Daniel K.',
+    meta: 'General patient feedback',
+    time: '3 months ago',
     rating: 5,
-    text: 'L ambiance de la clinique est calme, l equipe est accueillante, et le suivi apres la visite est rassurant.',
+    text: 'The team was professional from the first call to the follow-up, and the office location was very convenient downtown.',
   },
 ];
 
@@ -44,8 +44,8 @@ const renderStars = (rating) =>
 const getInitial = (name) => name.trim().charAt(0).toUpperCase();
 
 function ReviewsSection({
-  label = 'Avis',
-  title = 'Retours de patients et experiences reelles',
+  label = 'Reviews',
+  title = 'Patient feedback and trusted care experiences',
   sectionId = 'reviews',
   limit,
 }) {

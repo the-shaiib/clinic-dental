@@ -11,11 +11,19 @@ const getContactRequests = async (req, res) => {
 
 const createContactRequest = async (req, res) => {
   try {
-    const { name, phone, message } = req.body;
-    if (!name || !phone || !message) {
-      return res.status(400).json({ message: 'Name, phone, and message are required.' });
+    const { name, phone, email, issue, preferredSlot, urgency, message } = req.body;
+    if (!name || !phone || !email || !issue) {
+      return res.status(400).json({ message: 'Name, phone, email, and issue are required.' });
     }
-    const request = await ContactRequest.create({ name, phone, message });
+    const request = await ContactRequest.create({
+      name,
+      phone,
+      email,
+      issue,
+      preferredSlot,
+      urgency,
+      message,
+    });
     return res.status(201).json(request);
   } catch {
     return res.status(500).json({ message: 'Failed to create contact request.' });

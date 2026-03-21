@@ -236,6 +236,11 @@
   line-height: 1.4;
 }
 
+.contact-page .confirmation-message a {
+  color: var(--primary);
+  font-weight: 700;
+}
+
 .contact-page .confirmation-actions {
   display: flex;
   justify-content: center;

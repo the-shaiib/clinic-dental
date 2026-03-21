@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { getAuthUser } from '../../config/authStorage';
+import { clinicInfo } from '../../config/clinicInfo';
 import './Header.css';
 
 const THEME_STORAGE_KEY = 'clinic_theme';
 
 const navItems = [
-  { to: '/', label: 'Accueil', end: true },
-  { to: '/clinic', label: 'Clinique' },
+  { to: '/', label: 'Home', end: true },
+  { to: '/clinic', label: 'Clinic' },
   { to: '/contact', label: 'Contact' },
 ];
 
@@ -89,7 +90,7 @@ function Header() {
       <header className="site-header">
         <div className="header-inner">
           <Link className="brand" to="/" onClick={handleCloseMenu}>
-            <span>Dr. Bijarch Latifa</span>
+            <span>{clinicInfo.doctorName}</span>
           </Link>
 
           <nav className={`nav-links ${isMenuOpen ? 'open' : ''}`}>

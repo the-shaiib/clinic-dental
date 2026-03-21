@@ -3,19 +3,6 @@ import { Link } from 'react-router-dom';
 import { clinicInfo } from '../../config/clinicInfo';
 import servicesData from './Services/servicesData';
 import BlurImage from '../../components/Media/BlurImage';
-import mainImage from '../../assets/mainimg.png';
-import gallery1 from '../../assets/clinic-img/g.png';
-import gallery2 from '../../assets/clinic-img/g2.png';
-import gallery3 from '../../assets/clinic-img/g3.png';
-import gallery4 from '../../assets/clinic-img/g4.png';
-import gallery5 from '../../assets/clinic-img/g5.png';
-import gallery6 from '../../assets/clinic-img/g6.png';
-import before1 from '../../assets/clinic-img/b1.png';
-import before2 from '../../assets/clinic-img/b2.png';
-import before3 from '../../assets/clinic-img/b3.png';
-import after1 from '../../assets/clinic-img/a1.png';
-import after2 from '../../assets/clinic-img/a2.png';
-import after3 from '../../assets/clinic-img/a3.png';
 import ResultSection from '../Result/ResultSection';
 import ReviewsSection from '../Reviews/ReviewsSection';
 import './HomePage.css';
@@ -23,34 +10,58 @@ import './HomePage.css';
 function HomePage() {
   const services = servicesData;
   const galleryItems = [
-    { image: gallery1, title: 'Accueil du cabinet', description: 'Espace reception lumineux.' },
-    { image: gallery2, title: 'Salle de soins', description: 'Confort et hygiene.' },
-    { image: gallery3, title: 'Materiel moderne', description: 'Equipements de precision.' },
-    { image: gallery4, title: 'Espace patient', description: 'Ambiance calme.' },
-    { image: gallery5, title: 'Equipe dentaire', description: 'Soins professionnels.' },
-    { image: gallery6, title: 'Zone sterile', description: 'Protocoles rigoureux.' },
+    {
+      image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=900&q=80',
+      title: 'Consultation-ready environment',
+      description: 'Modern tools and a polished downtown setting.',
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=900&q=80',
+      title: 'Advanced treatment rooms',
+      description: 'Clean, calm spaces for restorative and cosmetic care.',
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1606811856475-23254db5e0f3?auto=format&fit=crop&w=900&q=80',
+      title: 'Implant and restoration planning',
+      description: 'Detailed care plans designed around function and aesthetics.',
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1588776814546-ec7e4f8f2587?auto=format&fit=crop&w=900&q=80',
+      title: 'Orthodontic support',
+      description: 'Straightforward aligner and orthodontic follow-up.',
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=860&q=80',
+      title: 'Patient-centered care',
+      description: 'Clear communication from booking through treatment.',
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=860&q=80',
+      title: 'Professional hygiene standards',
+      description: 'Consistent safety and comfort for every visit.',
+    },
   ];
   const beforeAfterCases = [
     {
       _id: 'case-1',
-      title: 'Alignement',
-      note: 'Alignement et harmonie du sourire.',
-      beforeImage: before1,
-      afterImage: after1,
+      title: 'Smile Alignment',
+      note: 'We begin with bite and alignment assessment, then build a treatment path that balances comfort and aesthetics.',
+      beforeImage: 'https://images.unsplash.com/photo-1588776814546-ec7e4f8f2587?auto=format&fit=crop&w=700&q=80',
+      afterImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=700&q=80',
     },
     {
       _id: 'case-2',
-      title: 'Blanchiment',
-      note: 'Teinte plus claire et sourire lumineux.',
-      beforeImage: before2,
-      afterImage: after2,
+      title: 'Smile Brightening',
+      note: 'Whitening plans are tailored to sensitivity, lifestyle, and the level of brightness each patient wants.',
+      beforeImage: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=700&q=80',
+      afterImage: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=720&q=80',
     },
     {
       _id: 'case-3',
-      title: 'Restauration',
-      note: 'Forme et teinte harmonisees pour un sourire naturel.',
-      beforeImage: before3,
-      afterImage: after3,
+      title: 'Implant Restoration',
+      note: 'Implant consultations focus on function, stability, and a natural-looking final result.',
+      beforeImage: 'https://images.unsplash.com/photo-1606811856475-23254db5e0f3?auto=format&fit=crop&w=700&q=80',
+      afterImage: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=720&q=80',
     },
   ];
 
@@ -76,11 +87,11 @@ function HomePage() {
           <p className="home-label">{clinicInfo.heroTitle}</p>
           <h1 className="clinic-title">
             <span className="name-main">{clinicInfo.doctorName}</span>
-            <span className="name-sub">Cabinet Dentaire</span>
+            <span className="name-sub">{clinicInfo.brandName}</span>
           </h1>
           <p className="clinic-description">
-            {clinicInfo.tagline} Prise de rendez-vous rapide, suivi clair, et resultats visibles pour rassurer les patients
-            des le premier rendez-vous.
+            {clinicInfo.tagline} Appointment support is simple, treatment explanations stay clear, and every visit is built
+            around comfort and confidence.
           </p>
 
           <div className="hero-meta">
@@ -92,30 +103,33 @@ function HomePage() {
               <i className="fa-solid fa-phone"></i>
               {clinicInfo.phonePrimary}
             </a>
-            <a href={clinicInfo.phoneSecondaryHref}>
-              <i className="fa-solid fa-phone"></i>
-              {clinicInfo.phoneSecondary}
+            <a href={clinicInfo.emailHref}>
+              <i className="fa-solid fa-envelope"></i>
+              {clinicInfo.email}
             </a>
           </div>
 
           <div className="home-actions">
             <Link className="btn btn-primary" to="/contact">
               <i className="fa-solid fa-calendar-check"></i>
-              Prendre rendez-vous
+              Request appointment
             </Link>
             <Link className="btn btn-link" to="/clinic">
               <i className="fa-solid fa-hospital"></i>
-              Visiter la clinique
+              Explore the clinic
             </Link>
           </div>
         </div>
 
         <div className="home-image fade-right fade-delay-1">
           <div className="home-image-frame">
-            <BlurImage src={mainImage} alt="Image principale du cabinet" />
+            <BlurImage
+              src="https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=900&q=80"
+              alt="BrightSmile treatment room"
+            />
             <span className="image-badge">
               <i className="fa-solid fa-tooth"></i>
-              Rendez-vous - Confiance - Soin
+              San Francisco - Comfort - Precision
             </span>
           </div>
         </div>
@@ -124,8 +138,8 @@ function HomePage() {
       <section className="home-services-lite">
         <div className="services-lite-head fade-up">
           <p className="section-tag">Services</p>
-          <h2>Des soins axes sur le confort et les resultats</h2>
-          <p className="lead">Des traitements clairs, des outils modernes, et une experience calme du debut a la fin.</p>
+          <h2>Specialized care designed for comfort, precision, and visible results</h2>
+          <p className="lead">Modern dentistry with clear treatment planning for local and international patients.</p>
         </div>
         <motion.div
           className="services-lite-grid"
@@ -143,7 +157,7 @@ function HomePage() {
               {service.tag ? <span className="services-lite-tag">{service.tag}</span> : null}
               <Link className="services-lite-link" to="/contact#contact-form">
                 <i className="fa-solid fa-arrow-right"></i>
-                Prendre rendez-vous
+                Request appointment
               </Link>
             </motion.article>
           ))}
@@ -154,9 +168,9 @@ function HomePage() {
 
       <section className="home-gallery">
         <div className="gallery-head fade-up">
-          <p className="section-tag">Galerie</p>
-          <h2>Au coeur de la clinique, des moments de soin reels</h2>
-          <p className="lead">Un environnement propre et calme, concu pour le confort, la securite, et de beaux resultats.</p>
+          <p className="section-tag">Clinic Gallery</p>
+          <h2>Inside the kind of environment patients expect from a premium city clinic</h2>
+          <p className="lead">Professional treatment areas, modern equipment, and a steady focus on patient comfort.</p>
         </div>
         <motion.div
           className="home-gallery-grid"
@@ -170,7 +184,7 @@ function HomePage() {
               <motion.figure className="home-gallery-item" variants={staggerItem} key={`${item.image}-${index}`}>
                 <BlurImage
                   src={item.image}
-                  alt={item.title ? `${item.title} - ${clinicInfo.doctorName}` : 'Galerie de la clinique'}
+                  alt={item.title ? `${item.title} - ${clinicInfo.doctorName}` : 'Clinic gallery'}
                 />
                 {hasMeta ? (
                   <figcaption className="home-gallery-meta">
@@ -185,8 +199,8 @@ function HomePage() {
       </section>
 
       <ReviewsSection
-        label="Avis patients"
-        title="La confiance des familles et des professionnels actifs"
+        label="Patient Reviews"
+        title="Trusted by busy professionals, families, and smile makeover patients"
       />
     </section>
   );

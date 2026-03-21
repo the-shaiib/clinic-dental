@@ -5,18 +5,15 @@ const normalizeWhatsAppNumber = (raw) => {
   const digits = String(raw || '').replace(/\D/g, '');
   if (!digits) return null;
   if (digits.startsWith('00')) return digits.slice(2);
-  if (digits.startsWith('0') && digits.length === 10) {
-    return `212${digits.slice(1)}`;
-  }
   return digits;
 };
 
 const buildWhatsAppUrl = () => {
-  const normalized = normalizeWhatsAppNumber('0611 280 026');
+  const normalized = normalizeWhatsAppNumber(clinicInfo.whatsappNumber || clinicInfo.phonePrimary);
   if (!normalized) return null;
 
   const message =
-    'Bonjour Dr. Bijarch, je souhaiterais reserver un creneau pour une consultation dentaire. Quelles sont vos prochaines disponibilites ? Merci.';
+    'Hello Dr. Morgan, I would like to book a dental consultation. Could you please share your next available appointment times?';
   const encoded = encodeURIComponent(message);
 
   return `https://wa.me/${normalized}?text=${encoded}`;
@@ -32,7 +29,7 @@ function WhatsAppWidget() {
       href={url}
       target="_blank"
       rel="noreferrer"
-      aria-label="Rendez-vous WhatsApp"
+      aria-label="WhatsApp appointment support"
       title="WhatsApp"
       style={{ position: 'fixed', right: 24, bottom: 24, zIndex: 9999 }}
     >

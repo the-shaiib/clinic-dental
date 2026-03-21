@@ -50,25 +50,22 @@ const ensureJsonLd = (data) => {
 
 function Seo() {
   const siteUrl = getSiteUrl();
-  const title = `${clinicInfo.doctorName} | Dentiste Marrakech`;
+  const title = `${clinicInfo.doctorName} | San Francisco Dentist`;
   const description =
-    "Cabinet dentaire a Marrakech. Rendez-vous rapides, soins modernes, et suivi rassurant pour un sourire sain.";
+    'BrightSmile Advanced Dental Care in San Francisco offers cosmetic dentistry, implants, Invisalign, whitening, and oral surgery with modern patient support.';
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Dentist',
-    name: clinicInfo.doctorName,
+    name: clinicInfo.brandName,
+    email: clinicInfo.email,
     address: {
       '@type': 'PostalAddress',
       streetAddress: clinicInfo.address,
-      addressLocality: 'Marrakech',
-      addressRegion: 'Marrakesh-Safi',
-      addressCountry: 'MA',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: 31.6295,
-      longitude: -7.9811,
+      addressLocality: clinicInfo.city,
+      addressRegion: clinicInfo.region,
+      postalCode: clinicInfo.postalCode,
+      addressCountry: 'US',
     },
     openingHours: clinicInfo.hours,
     telephone: [clinicInfo.phonePrimary, clinicInfo.phoneSecondary].filter(Boolean),
