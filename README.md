@@ -46,3 +46,5 @@ npm run dev
 cd client
 npm install
 npm run dev
+
+👉 https://github.com/the-shaiib/clinic-dental
