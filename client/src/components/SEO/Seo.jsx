@@ -54,26 +54,26 @@ function Seo() {
   const description =
     'BrightSmile Advanced Dental Care in San Francisco offers cosmetic dentistry, implants, Invisalign, whitening, and oral surgery with modern patient support.';
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Dentist',
-    name: clinicInfo.brandName,
-    email: clinicInfo.email,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: clinicInfo.address,
-      addressLocality: clinicInfo.city,
-      addressRegion: clinicInfo.region,
-      postalCode: clinicInfo.postalCode,
-      addressCountry: 'US',
-    },
-    openingHours: clinicInfo.hours,
-    telephone: [clinicInfo.phonePrimary, clinicInfo.phoneSecondary].filter(Boolean),
-    url: siteUrl || undefined,
-  };
-
   useEffect(() => {
     if (typeof document === 'undefined') return;
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Dentist',
+      name: clinicInfo.brandName,
+      email: clinicInfo.email,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: clinicInfo.address,
+        addressLocality: clinicInfo.city,
+        addressRegion: clinicInfo.region,
+        postalCode: clinicInfo.postalCode,
+        addressCountry: 'US',
+      },
+      openingHours: clinicInfo.hours,
+      telephone: [clinicInfo.phonePrimary, clinicInfo.phoneSecondary].filter(Boolean),
+      url: siteUrl || undefined,
+    };
+
     document.title = title;
     ensureMeta('description', description);
     ensureMeta('robots', 'index, follow');

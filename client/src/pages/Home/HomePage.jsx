@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import Skeleton from 'react-loading-skeleton';
 import { clinicInfo } from '../../config/clinicInfo';
+import { useServices } from '../../hooks/useClinicData';
 import servicesData from './Services/servicesData';
 import BlurImage from '../../components/Media/BlurImage';
 import ResultSection from '../Result/ResultSection';
@@ -8,7 +10,13 @@ import ReviewsSection from '../Reviews/ReviewsSection';
 import './HomePage.css';
 
 function HomePage() {
-  const services = servicesData;
+  const {
+    data: liveServices = [],
+    isPending: servicesPending,
+    isError: servicesError,
+  } = useServices();
+  const services = liveServices.length > 0 ? liveServices : servicesError ? servicesData : [];
+  const showServiceSkeleton = servicesPending && services.length === 0;
   const galleryItems = [
     {
       image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=900&q=80',
@@ -147,20 +155,37 @@ function HomePage() {
           initial="hidden"
           animate="visible"
         >
-          {services.map((service) => (
-            <motion.article className="services-lite-card" variants={staggerItem} key={service.title}>
-              <div className="icon-shell">
-                <i className={service.icon || 'fa-solid fa-tooth'}></i>
-              </div>
-              <h3>{service.title}</h3>
-              <p>{service.description}</p>
-              {service.tag ? <span className="services-lite-tag">{service.tag}</span> : null}
-              <Link className="services-lite-link" to="/contact#contact-form">
-                <i className="fa-solid fa-arrow-right"></i>
-                Request appointment
-              </Link>
-            </motion.article>
-          ))}
+          {showServiceSkeleton
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <motion.article
+                  className="services-lite-card skeleton-card"
+                  variants={staggerItem}
+                  key={`service-skeleton-${index}`}
+                  aria-hidden="true"
+                >
+                  <div className="icon-shell skeleton-icon">
+                    <Skeleton circle width={34} height={34} />
+                  </div>
+                  <Skeleton className="service-title-skeleton" width="70%" height={18} />
+                  <Skeleton count={3} className="service-copy-skeleton" />
+                  <Skeleton width={92} height={26} />
+                  <Skeleton width={138} height={18} />
+                </motion.article>
+              ))
+            : services.map((service) => (
+                <motion.article className="services-lite-card" variants={staggerItem} key={service._id || service.title}>
+                  <div className="icon-shell">
+                    <i className={service.icon || 'fa-solid fa-tooth'}></i>
+                  </div>
+                  <h3>{service.title}</h3>
+                  <p>{service.description}</p>
+                  {service.tag ? <span className="services-lite-tag">{service.tag}</span> : null}
+                  <Link className="services-lite-link" to="/contact#contact-form">
+                    <i className="fa-solid fa-arrow-right"></i>
+                    Request appointment
+                  </Link>
+                </motion.article>
+              ))}
         </motion.div>
       </section>
 

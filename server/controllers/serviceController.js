@@ -2,7 +2,11 @@ const Service = require('../models/Service');
 
 const getServices = async (req, res) => {
   try {
-    const services = await Service.find().sort({ createdAt: -1 });
+    const services = await Service.find()
+      .select('title description tag icon createdAt')
+      .sort({ createdAt: -1 })
+      .lean();
+    res.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=300');
     return res.json(services);
   } catch {
     return res.status(500).json({ message: 'Failed to fetch services.' });

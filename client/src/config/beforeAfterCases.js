@@ -46,7 +46,7 @@ export const loadStoredBeforeAfterCases = () => {
     const parsed = JSON.parse(stored);
     if (!Array.isArray(parsed)) return [];
     return normalizeBeforeAfterCases(parsed);
-  } catch (error) {
+  } catch {
     return [];
   }
 };

@@ -70,7 +70,7 @@ export const loadServices = () => {
     const parsed = JSON.parse(stored);
     if (!Array.isArray(parsed)) return defaultServices;
     return normalizeServices(parsed);
-  } catch (error) {
+  } catch {
     return defaultServices;
   }
 };

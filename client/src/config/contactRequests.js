@@ -13,7 +13,7 @@ export const loadContactRequests = () => {
     const parsed = JSON.parse(stored);
     if (!Array.isArray(parsed)) return defaultContactRequests;
     return parsed.filter((request) => !legacySeedIds.has(request?.id));
-  } catch (error) {
+  } catch {
     return defaultContactRequests;
   }
 };

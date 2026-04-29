@@ -66,13 +66,17 @@ const startKeepAlive = () => {
     return;
   }
 
-  setInterval(async () => {
+  const ping = async () => {
     try {
       await axios.get(`${baseUrl}/ping`);
     } catch (error) {
       console.warn('Keep-alive ping failed:', error?.message || error);
     }
-  }, KEEP_ALIVE_INTERVAL_MS);
+  };
+
+  setTimeout(ping, 5000).unref?.();
+  const keepAliveTimer = setInterval(ping, KEEP_ALIVE_INTERVAL_MS);
+  keepAliveTimer.unref?.();
 };
 
 const startServer = async () => {

@@ -51,7 +51,7 @@ export const loadStoredGalleryItems = () => {
     const parsed = JSON.parse(stored);
     if (!Array.isArray(parsed)) return [];
     return normalizeGalleryItems(parsed);
-  } catch (error) {
+  } catch {
     return [];
   }
 };

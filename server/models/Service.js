@@ -27,4 +27,6 @@ const serviceSchema = new mongoose.Schema({
   },
 });
 
+serviceSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('Service', serviceSchema);

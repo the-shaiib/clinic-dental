@@ -218,6 +218,7 @@
 
 .home-page .services-lite-card.skeleton-card {
   min-height: 230px;
+  pointer-events: none;
 }
 
 .home-page .services-lite-card:hover {
@@ -239,6 +240,18 @@
 
 .home-page .services-lite-card .icon-shell i {
   font-size: 1.45rem;
+}
+
+.home-page .services-lite-card .skeleton-icon {
+  background: rgba(31, 78, 255, 0.07);
+}
+
+.home-page .services-lite-card .service-title-skeleton {
+  margin-top: 2px;
+}
+
+.home-page .services-lite-card .service-copy-skeleton {
+  width: 100%;
 }
 
 .home-page .services-lite-card h3 {
